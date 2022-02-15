@@ -12,9 +12,17 @@ You are given the start word. For each move:
 
 Each move has to result in a real word! To score better, dwindle down to the shortest word *and path* possible.
 
+## Scoring Strategies
+
+The goal is to get both the shortest final word (ideally, one character, like `A` or `I`), but also the shortest path (fewest number of words) to that final short word.
+
+As such, your scoring strategy has to balance these (sometimes competing) goals. For example, you may score more for a path that ends in the word "OR" than if you continued the path from "OR" to "ON" to "AN" to "A". Even though the single letter word is a main goal of the game, adding 3 extra moves to get there may not provide a better outcome.
+
+You'll also score more for a path that prioritizes dwindling down to shorter words more quickly, as opposed to a path with several subsequent words of the same length (like 3 or 4), where each word was a letter swap to different word. The downside, of course is, if you quickly dwindle down to a 3-letter or 4-letter word, you may have limited yourself in terms of further path moves.
+
 ## Undo
 
-You get one undo per game. But if you flip on **EASY** mode, you get unlimited undos.
+You're allowed one undo per game. But if you flip on **EASY** mode, you get unlimited undos.
 
 ## Example Games
 
