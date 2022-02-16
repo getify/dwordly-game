@@ -1,0 +1,150 @@
+#!/usr/bin/env node
+
+"use strict";
+
+var fs = require("fs");
+var path = require("path");
+var util = require("util");
+var { execFile } = require("child_process");
+
+var micromatch = require("micromatch");
+var recursiveReadDir = require("recursive-readdir-sync");
+
+var params = require("minimist")(process.argv.slice(2),{
+	boolean: [ "help", ],
+	alias: {},
+	default: {
+		help: false,
+	},
+});
+
+var execFileAsync = util.promisify(execFile);
+
+const ROOT_DIR = path.join(__dirname,"..");
+const MONIO_DIST_ESM_DIR = path.join(ROOT_DIR,"node_modules","monio","dist","esm");
+const WEB_DIR = path.join(ROOT_DIR,"web");
+const WEB_IMPORT_MAP_PATH = path.join(WEB_DIR,"import-map.json");
+const WEB_JS_DIR = path.join(WEB_DIR,"js");
+const WEB_JS_NIM_DIR = path.join(WEB_DIR,"js-nim");
+
+(async function main(){
+	if (params.help) {
+		printHelp();
+		return;
+	}
+
+	try {
+		if (!safeMkdir(WEB_JS_NIM_DIR)) {
+			throw new Error(`Target directory (${WEB_JS_NIM_DIR}) does not exist and could not be created.`);
+		}
+
+		// run import-remap CLI on the client's /js tree
+		// to remap the dependencies
+		await execFileAsync(
+			path.join(ROOT_DIR,"node_modules",".bin","import-remap"),
+			[
+				`--from=${WEB_JS_DIR}`,
+				`--to=${WEB_JS_NIM_DIR}`,
+				`--map=${WEB_IMPORT_MAP_PATH}`,
+				"--ignore=**/*.json",
+				"--ignore=**/monio/*",
+				"-r"
+			]
+		);
+
+		// copy over external dependencies (monio) into
+		// monio's dist/esm/ to client's js/monio/ and js-nim/monio/
+		copyExternalDependencies();
+
+		console.log(`Web build complete (${WEB_DIR})`);
+	}
+	catch (err) {
+		showError(err);
+	}
+})();
+
+function printHelp() {
+	console.log("Build-Web usage:");
+	console.log("  build-web {OPTIONS}");
+	console.log("");
+	console.log("--help                     print this help");
+	console.log("");
+}
+
+function showError(err,includeHelp = false) {
+	console.error(err.toString());
+	if (includeHelp) {
+		console.log("");
+		printHelp();
+	}
+	process.exit(1);
+}
+
+function copyExternalDependencies() {
+	// scan the directory for input files?
+	if (isDirectory(MONIO_DIST_ESM_DIR)) {
+		let monioESMFiles;
+
+		try {
+			monioESMFiles = recursiveReadDir(MONIO_DIST_ESM_DIR);
+		}
+		catch (err) {
+			throw new Error("Monio could not be found");
+		}
+
+		copyFilesTo(monioESMFiles,MONIO_DIST_ESM_DIR,path.join(WEB_JS_DIR,"monio"),[ "**/*.json" ]);
+		copyFilesTo(monioESMFiles,MONIO_DIST_ESM_DIR,path.join(WEB_JS_NIM_DIR,"monio"),[ "**/*.json" ]);
+	}
+	else {
+		throw new Error("Monio could not be found");
+	}
+}
+
+function copyFilesTo(files,fromBasePath,toDir,skipPatterns) {
+	var webDirName = path.basename(WEB_DIR);
+
+	if (!safeMkdir(toDir)) {
+		throw new Error(`While copying Monio to ${webDirName}, directory (${toDir}) could not be created.`);
+	}
+
+	for (let fromPath of files) {
+		// should we skip copying this file?
+		if (matchesSkipPattern(fromPath,skipPatterns)) {
+			continue;
+		}
+		let relativePath = fromPath.slice(fromBasePath.length);
+		let outputPath = path.join(toDir,relativePath);
+		let outputDir = path.dirname(outputPath);
+
+		if (!fs.existsSync(outputDir)) {
+			if (!safeMkdir(outputDir)) {
+				throw new Error(`While copying Monio to ${webDirName}, directory (${outputDir}) could not be created.`);
+			}
+		}
+
+		let contents = fs.readFileSync(fromPath);
+		fs.writeFileSync(outputPath,contents);
+	}
+}
+
+function matchesSkipPattern(pathStr,skipPatterns) {
+	if (skipPatterns && skipPatterns.length > 0) {
+		return (micromatch(pathStr,skipPatterns).length > 0);
+	}
+}
+
+function isDirectory(pathStr) {
+	return fs.existsSync(pathStr) && fs.lstatSync(pathStr).isDirectory();
+}
+
+function safeMkdir(pathStr) {
+	if (!fs.existsSync(pathStr)) {
+		try {
+			fs.mkdirSync(pathStr,0o755);
+			return true;
+		}
+		catch (err) {}
+		return false;
+	}
+	return true;
+}

@@ -1,0 +1,19 @@
+{
+	"imports": {
+		"monio": "/js-nim/monio/index.mjs",
+		"monio/just": "/js-nim/monio/just.mjs",
+		"monio/nothing": "/js-nim/monio/nothing.mjs",
+		"monio/maybe": "/js-nim/monio/maybe.mjs",
+		"monio/either": "/js-nim/monio/either.mjs",
+		"monio/async-either": "/js-nim/monio/async-either.mjs",
+		"monio/io": "/js-nim/monio/io/io.mjs",
+		"monio/iox": "/js-nim/monio/io/iox.mjs",
+		"monio/io/x": "/js-nim/monio/io/iox.mjs",
+		"monio/io/any": "/js-nim/monio/io/any.mjs",
+		"monio/io/all": "/js-nim/monio/io/all.mjs",
+		"monio/io/helpers": "/js-nim/monio/io/helpers.mjs",
+		"monio/iox/helpers": "/js-nim/monio/io/x-helpers.mjs",
+		"monio/io/x/helpers": "/js-nim/monio/io/x-helpers.mjs",
+		"monio/util": "/js-nim/monio/lib/util.mjs"
+	}
+}

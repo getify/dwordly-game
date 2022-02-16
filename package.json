@@ -1,0 +1,19 @@
+{
+	"name": "dwirdle-game",
+	"version": "1.0.0",
+	"description": "A game where words dwindle down to the shortest possible",
+	"scripts": {
+		"build": "scripts/build-web",
+		"start": "npm run build && node server/index.js"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"monio": "~0.50.1"
+	},
+	"devDependencies": {
+		"import-remap": "~0.5.0",
+		"micromatch": "~4.0.4",
+		"minimist": "~1.2.5",
+		"recursive-readdir-sync": "~1.0.6"
+	}
+}
