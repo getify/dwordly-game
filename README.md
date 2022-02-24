@@ -1,6 +1,6 @@
-# Dwirdle
+# Dwordly
 
-Dwirdle (Dwindling **Wordle**... or [this](https://www.urbandictionary.com/define.php?term=Dwirdle) 😂) is a flip-twist of the viral famous game. In this game, words dwindle down to the shortest possible!
+Dwordly (Dwindling **Wordle**) is a flip-twist of the famous viral game. In Dwordly, you dwindle words down to the shortest possible!
 
 ## Game Concept
 
