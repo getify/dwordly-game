@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
+<script>
+// compute the vw/vh units more reliably than CSS does itself
+if (document.documentElement && document.documentElement.style && document.documentElement.style.setProperty) {
+	let width = Math.max(400,document.documentElement.clientWidth);
+	let height = Math.max(400,document.documentElement.clientHeight);
+	document.documentElement.style.setProperty("--vw-unit",`${(width / 100).toFixed(1)}px`);
+	document.documentElement.style.setProperty("--vh-unit",`${(height / 100).toFixed(1)}px`);
+}
+</script>
+<title>Dwordly</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 <meta name="Description" content="A game where words dwindle down to the shortest possible">
@@ -8,6 +18,27 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<header>Dwordly</header>
+<div id="play-area">
+	<div id="played-words"></div>
+	<div id="next-play"><form>
+		<div class="word"></div>
+		<div id="play-action-buttons">
+			<button type="button" id="insert-letter-btn" aria-label="Insert a letter" disabled>+</button>
+			<button type="button" id="play-word-btn" aria-label="Play this word" disabled>✓</button>
+			<button type="button" id="reset-word-btn" aria-label="Reset this play" disabled>⟲</button>
+		</div>
+	</form></div>
+</div>
+<div id="keyboard" aria-label="On-screen keyboard"><form>
+	<button type="button" disabled>Q</button><button type="button" disabled>W</button><button type="button" disabled>E</button><button type="button" disabled>R</button><button type="button" disabled>T</button><button type="button" disabled>Y</button><button type="button" disabled>U</button><button type="button" disabled>I</button><button type="button" disabled>O</button><button type="button" disabled>P</button>
+
+	<button type="button" disabled>A</button><button type="button" disabled>S</button><button type="button" disabled>D</button><button type="button" disabled>F</button><button type="button" disabled>G</button><button type="button" disabled>H</button><button type="button" disabled>J</button><button type="button" disabled>K</button><button type="button" disabled>L</button>
+
+	<button type="button" disabled>Z</button><button type="button" disabled>X</button><button type="button" disabled>C</button><button type="button" disabled>V</button><button type="button" disabled>B</button><button type="button" disabled>N</button><button type="button" disabled>M</button>
+</form></div>
+
 </body>
 
 <script type="importmap">
