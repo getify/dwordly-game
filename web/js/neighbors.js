@@ -220,11 +220,6 @@ function buildNeighbors() {
 			meta[word.text] = new Set();
 		}
 
-		// single letter word (no analysis needed)?
-		if (word.text.length == 1) {
-			continue;
-		}
-
 		// generate all the letter-switch and letter-removal
 		// patterns for this word
 		wordPatterns.length = 0;

@@ -31,13 +31,13 @@ B O U N D
 
 B O N D
 
-B I N D
+B A N D
 
-B I N
+A N D
 
-I N
+A D
 
-I
+A
 ```
 
 You may get a little stuck; perhaps add a letter to jump to a different dwindling word path:
@@ -68,20 +68,18 @@ A T
 A
 ```
 
-If you'd only seen it, the above game *could* have been played with 5 fewer moves and a much better score!
+But if you'd only *seen it*, the above game *could* have been played with 6 fewer moves and a much better score!
 
 ```
 S P E C K
 
 P E C K
 
-P A C K
+P E A K
 
-P A C T
+P E A
 
-P A T
-
-A T
+P A
 
 A
 ```
