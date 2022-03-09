@@ -20,6 +20,7 @@ export {
 	loadDictionary,
 	selectDifficulty,
 	getGame,
+	movesPossible,
 	checkNextWord,
 	scoreGame,
 };
@@ -44,11 +45,32 @@ function *selectDifficulty({ state, },difficulty) {
 
 function *getGame({ state: { neighbors, games, }, }) {
 	var gameIdx = Math.round(Math.random() * 1E9) % games.length;
+	var game = games[gameIdx];
 
 	// cheating at the game (temporarily)
-	console.log( yield IO.do(findShortestPath,games[gameIdx][0]) );
+	console.log( yield IO.do(findShortestPath,game[0]) );
 
-	return games[gameIdx];
+	return game;
+}
+
+function *movesPossible({ state: { neighbors, }, },words) {
+	var recentWord = words[words.length - 1];
+
+	// already at a single-letter word?
+	if (recentWord.length == 1) {
+		return false;
+	}
+
+	// check all neighbor words to see if any can be
+	// played?
+	for (let { text: nextWord } of neighbors[recentWord]) {
+		// found an available (not already used) word
+		// to play?
+		if (!words.includes(nextWord)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function *checkNextWord({ state: { neighbors, }, },words,nextWord) {
@@ -73,27 +95,30 @@ function *findShortestPath({ state: { neighbors, }, },word) {
 		while (queue.length > 0) {
 			let nextWord = queue.shift();
 
-			// keep track of the shortest word we find
-			// during the traversal
-			if (nextWord.length < shortestWord.length) {
-				shortestWord = nextWord;
-			}
+			// is this word actually in our dictionary?
+			if (neighbors[nextWord]) {
+				// keep track of the shortest word we find
+				// during the traversal
+				if (nextWord.length < shortestWord.length) {
+					shortestWord = nextWord;
+				}
 
-			for (let { text: neighbor } of neighbors[nextWord]) {
-				// haven't seen (queued up) this word
-				// yet?
-				if (!visited.has(neighbor)) {
-					// record path from this neighbor back
-					// to the previous word
-					pathTree[neighbor] = nextWord;
+				for (let { text: neighbor } of neighbors[nextWord]) {
+					// haven't seen (queued up) this word
+					// yet?
+					if (!visited.has(neighbor)) {
+						// record path from this neighbor back
+						// to the previous word
+						pathTree[neighbor] = nextWord;
 
-					// queue this word up for further
-					// inspection
-					queue[queue.length] = neighbor;
+						// queue this word up for further
+						// inspection
+						queue[queue.length] = neighbor;
 
-					// mark this word as having been
-					// queued up for further inspection
-					visited.add(neighbor);
+						// mark this word as having been
+						// queued up for further inspection
+						visited.add(neighbor);
+					}
 				}
 			}
 		}
@@ -104,13 +129,26 @@ function *findShortestPath({ state: { neighbors, }, },word) {
 		// traverse the discovered paths in reverse
 		// from shortest-found word back up to target
 		// word
-		let shortestPath = [];
+		let shortestPath;
 		let pathWord = shortestWord;
-		while (pathTree[pathWord]) {
+
+		// do we have a path longer than two words?
+		if (pathTree[pathWord]) {
+			shortestPath = [];
+			while (pathTree[pathWord]) {
+				shortestPath[shortestPath.length] = pathWord;
+				pathWord = pathTree[pathWord];
+			}
 			shortestPath[shortestPath.length] = pathWord;
-			pathWord = pathTree[pathWord];
 		}
-		shortestPath.push(pathWord);
+		// do we have a trivial 2-word path?
+		else if (Object.keys(pathTree).length > 0) {
+			shortestPath = [ Object.keys(pathTree)[0], word, ];
+		}
+		// otherwise, a word is its own trivial path
+		else {
+			shortestPath = [ shortestWord, ];
+		}
 
 		// reverse the traversal path so it now
 		// starts with the target word and moves

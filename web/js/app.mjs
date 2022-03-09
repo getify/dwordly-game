@@ -47,6 +47,7 @@ import {
 	loadDictionary,
 	selectDifficulty,
 	getGame,
+	movesPossible,
 	checkNextWord,
 	scoreGame,
 } from "./games.mjs";
@@ -582,10 +583,7 @@ function *onResetWord({
 }
 
 function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
-	if (
-		[ 2, 5, ].includes(state.playMode) &&
-		!state.playedWords.includes(state.pendingNextWord)
-	) {
+	if ([ 2, 5, ].includes(state.playMode)) {
 		let wordAllowed = yield IO.do(checkNextWord,state.playedWords,state.pendingNextWord);
 
 		if (wordAllowed) {
@@ -593,7 +591,16 @@ function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 			state.playedWords.push(state.pendingNextWord);
 			yield IO.do(renderPlayedWords);
 
-			if (state.pendingNextWord.length == 1) {
+			let moreMovedAllowed = yield IO.do(movesPossible,state.playedWords);
+			if (moreMovedAllowed) {
+				yield IO.do(renderNextPlayWord);
+				yield IO.do(scrollDownPlayArea);
+				yield IO.do(updatePlayMode,/*nextPlayMode=*/0);
+
+				// cheating at the game (temporarily)
+				console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
+			}
+			else {
 				yield addClass("complete",playedWordsEl);
 				yield addClass("hidden",nextPlayEl);
 				let nextPlayWordEl = yield findElement(".word",nextPlayEl);
@@ -601,14 +608,6 @@ function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 				yield setInnerHTML("",nextPlayWordEl);
 				yield IO.do(scrollDownPlayArea);
 				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
-			}
-			else {
-				yield IO.do(renderNextPlayWord);
-				yield IO.do(scrollDownPlayArea);
-				yield IO.do(updatePlayMode,/*nextPlayMode=*/0);
-
-				// cheating at the game (temporarily)
-				console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
 			}
 		}
 		else {

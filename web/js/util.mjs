@@ -167,7 +167,12 @@ function reportError(err) {
 		console.log(err._inspect());
 	}
 	else if (isFunction(err.toString)) {
-		console.log(err.toString());
+		if (err.stack) {
+			console.log(err.stack);
+		}
+		else {
+			console.log(err.toString());
+		}
 	}
 	else {
 		console.log(err);
