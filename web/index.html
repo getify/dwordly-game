@@ -19,7 +19,24 @@ if (document.documentElement && document.documentElement.style && document.docum
 </head>
 <body>
 
-<header>Dwordly</header>
+<header>
+	<button type="button" id="menu-toggle-btn" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle main menu">☰</button>
+
+	<span>DWORDLY</span>
+</header>
+<menu role="menu" id="main-menu" class="hidden" aria-hidden="true" aria-label="main menu">
+	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
+	<li aria-role="none"><button type="button" id="new-game-btn" aria-role="menuitem" aria-label="start a new game">new game</button></li>
+	<li aria-role="none">
+		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" aria-role="menuitem" aria-label="select easy game mode"><label for="easy-difficulty"> easy</label>
+	</li>
+	<li aria-role="none">
+		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" aria-role="menuitem" aria-label="select medium game mode" checked><label for="medium-difficulty"> medium</label>
+	</li>
+	<li aria-role="none">
+		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" aria-role="menuitem" aria-label="select hard game mode"><label for="hard-difficulty"> hard</label>
+	</li>
+</menu>
 <div id="play-area">
 	<div id="played-words"></div>
 	<div id="next-play"><form>

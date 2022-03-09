@@ -64,6 +64,7 @@ export {
 	removeClass,
 	setCSSVar,
 	cancelEvent,
+	requestJSON,
 	reportError,
 };
 
@@ -150,6 +151,10 @@ function *cancelEvent(env,evt) {
 	evt.preventDefault();
 	evt.stopPropagation();
 	evt.stopImmediatePropagation();
+}
+
+function requestJSON(url) {
+	return IO(() => fetch(url).then(res => res.json()));
 }
 
 function reportError(err) {

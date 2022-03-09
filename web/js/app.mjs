@@ -4,6 +4,7 @@ import {
 	doIOBind,
 	match,
 	iAnd,
+	iNot,
 } from "monio/io/helpers";
 import IOx from "monio/iox";
 import {
@@ -40,7 +41,15 @@ import {
 	setCSSVar,
 	cancelEvent,
 	reportError,
-} from "./util.js";
+} from "./util.mjs";
+
+import {
+	loadDictionary,
+	selectDifficulty,
+	getGame,
+	checkNextWord,
+	scoreGame,
+} from "./games.mjs";
 
 IO.do(main).run(window).catch(reportError);
 
@@ -53,6 +62,8 @@ function *main({ window: win, document: doc, } = {}) {
 		doc,
 
 		// get DOM element references
+		menuToggleBtn: yield getElement("menu-toggle-btn"),
+		mainMenuEl: yield getElement("main-menu"),
 		playAreaEl: yield getElement("play-area"),
 		playedWordsEl: yield getElement("played-words"),
 		nextPlayEl: yield getElement("next-play"),
@@ -64,13 +75,15 @@ function *main({ window: win, document: doc, } = {}) {
 
 		state: {
 			playMode: 0,
-			maxWordLength: 5,
-			playedWords: [ "BEACH", ],
+			maxWordLength: 0,
+			playedWords: [],
 			pendingNextWord: null,
 		},
 	};
 
 	// get more DOM element references
+	viewContext.difficultySelectorEls =
+		yield findElements("input[name=difficulty-selector]",viewContext.mainMenuEl);
 	viewContext.nextPlayFormEl = yield findElement("form",viewContext.nextPlayEl);
 	viewContext.keyboardFormEl = yield findElement("form",viewContext.keyboardEl);
 	viewContext.keyboardBtns = yield findElements("button",viewContext.keyboardEl);
@@ -82,6 +95,8 @@ function *main({ window: win, document: doc, } = {}) {
 function *runApp({
 	win,
 	doc,
+	menuToggleBtn,
+	mainMenuEl,
 	insertLetterBtn,
 	playWordBtn,
 	resetWordBtn,
@@ -89,6 +104,9 @@ function *runApp({
 	keyboardFormEl,
 	state,
 }) {
+	// load the word dictionary
+	yield IO.do(loadDictionary);
+
 	// compute viewport dimensions initially
 	yield IO.do(computeViewportDimensions);
 
@@ -106,6 +124,16 @@ function *runApp({
 			debounce: 75,
 			maxDebounceDelay: 250
 		}),
+	]);
+
+	// handle main-menu toggles
+	yield doIOxBackground(onToggleMainMenu,[
+		IOx.onEvent(menuToggleBtn,"click"),
+	]);
+
+	// handle main-menu clicks
+	yield doIOxBackground(onMainMenuClicks,[
+		IOx.onEvent(mainMenuEl,"click"),
 	]);
 
 	// cancel submit events from the `form` elements
@@ -156,17 +184,110 @@ function *runApp({
 		}),
 	]);
 
+	// start a new game
+	yield IO.do(onNewGame);
+
+	// init the play state
+	yield IO.do(updatePlayMode,/*nextPlayMode=*/state.playMode);
+}
+
+function *onToggleMainMenu(viewContext) {
+	var { doc, menuToggleBtn, mainMenuEl, } = viewContext;
+
+	// main menu currently closed?
+	if (yield matches(".hidden",mainMenuEl)) {
+		yield removeClass("hidden",mainMenuEl);
+		yield setElAttr("aria-hidden","false",mainMenuEl);
+		yield setElAttr("aria-expanded","true",menuToggleBtn);
+
+		// listen for all clicks on document (in capturing phase)
+		viewContext.docClickEvents = IOx.onEvent(doc,"click",{ evtOpts: { capture: true, }, });
+		return doIOxBackground(onDocClicks,[ viewContext.docClickEvents, ]);
+	}
+	else {
+		return IO.do(closeMainMenu);
+	}
+}
+
+function *closeMainMenu(viewContext) {
+	var { menuToggleBtn, mainMenuEl, } = viewContext;
+
+	// main menu visible?
+	if (yield iNot(matches(".hidden",mainMenuEl))) {
+		yield addClass("hidden",mainMenuEl);
+		yield setElAttr("aria-hidden","true",mainMenuEl);
+		yield setElAttr("aria-expanded","false",menuToggleBtn);
+
+		// quit listening for document clicks
+		yield IO(({ docClickEvents, }) => docClickEvents.close());
+		viewContext.docClickEvents = null;
+	}
+}
+
+function *onMainMenuClicks({ mainMenuEl, },evt) {
+	var target = evt.target;
+
+	// main menu visible?
+	if (yield iNot(matches(".hidden",mainMenuEl))) {
+		return match(
+			// clicked on close button?
+			$=>matches("#close-menu-btn",target), $=>[
+				onToggleMainMenu,
+			],
+			$=>matches("#new-game-btn",target), $=>[
+				onNewGame,
+			]
+		);
+	}
+}
+
+function *onDocClicks({ mainMenuEl, },evt) {
+	if (yield IO(({ mainMenuEl, }) => !mainMenuEl.contains(evt.target))) {
+		yield IO.do(cancelEvent,evt);
+		return IO.do(closeMainMenu);
+	}
+}
+
+function *getSelectedDifficulty({ difficultySelectorEls, }) {
+	for (let el of difficultySelectorEls) {
+		if (yield isChecked(el)) {
+			let difficulty = yield getElProp("value",el);
+			return difficulty;
+		}
+	}
+}
+
+function *onNewGame({ state, }) {
+	yield IO.do(closeMainMenu);
+
+	var difficulty = yield IO.do(getSelectedDifficulty);
+	yield IO.do(selectDifficulty,difficulty);
+	var game = yield IO.do(getGame);
+
+	state.maxWordLength = game[0].length;
+	state.playedWords = [ game[0], ];
+
 	// render the initial played-words list
 	yield IO.do(renderPlayedWords);
 
 	// render the initial next-play word
 	yield IO.do(renderNextPlayWord);
 
-	// init the play state
-	yield IO.do(updatePlayMode,/*nextPlayMode=*/state.playMode);
+	// cheating at the game (temporarily)
+	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
 }
 
-function *renderPlayedWords({ playedWordsEl, state: { playedWords, }, }) {
+function *renderPlayedWords({
+	playAreaEl,
+	playedWordsEl,
+	state: {
+		maxWordLength,
+		playedWords,
+	},
+}) {
+	yield removeClass("complete",playedWordsEl);
+	yield setCSSVar("played-words-count",playedWords.length,playAreaEl);
+	yield setCSSVar("max-letter-count",maxWordLength,playAreaEl);
 	yield setInnerHTML("",playedWordsEl);
 
 	for (let [idx,word] of playedWords.entries()) {
@@ -199,6 +320,7 @@ function *renderPlayedWords({ playedWordsEl, state: { playedWords, }, }) {
 
 function *renderNextPlayWord(
 	{
+		nextPlayEl,
 		nextPlayFormEl,
 		state,
 		state: {
@@ -209,6 +331,8 @@ function *renderNextPlayWord(
 	selectLetterIdx = -1
 ) {
 	state.pendingNextWord = nextWord;
+
+	yield removeClass("hidden",nextPlayEl);
 
 	var wordEl = yield createElement("div");
 	yield addClass("word",wordEl);
@@ -279,12 +403,18 @@ function *onNextPlayWordClicks(viewContext,evt) {
 	return match(
 		matches("label",evtTarget), $=>[
 			IO.do(onNextPlayLetterToggleOff,evt),
+			closeMainMenu,
+			scrollDownPlayArea,
 		],
 		$=>matches(".insert-here-btn",evtTarget), $=>[
 			IO.do(onPickInsertPosition,evt),
+			closeMainMenu,
+			scrollDownPlayArea,
 		],
 		$=>matches(".remove-letter-btn",evtTarget), $=>[
 			IO.do(onRemoveLetter,evt),
+			closeMainMenu,
+			scrollDownPlayArea,
 		]
 	);
 }
@@ -300,6 +430,9 @@ function *updatePlayMode(
 	playMode
 ) {
 	state.playMode = playMode;
+
+	// make sure the main menu is closed
+	yield IO.do(closeMainMenu);
 
 	return match(
 		// initial (or reset) state?
@@ -362,14 +495,25 @@ function *updatePlayMode(
 			IO.do(updateRemoveButtons,/*enable=*/false),
 			IO.do(updateKeyboard,/*enable=*/false),
 		],
+		// game over?
+		playMode == 6, $=>[
+			disableEl(insertLetterBtn),
+			disableEl(playWordBtn),
+			disableEl(resetWordBtn),
+			IO.do(updateNextPlayLetters,/*enable=*/false),
+			IO.do(updateInsertButtons,/*enable=*/false),
+			IO.do(updateRemoveButtons,/*enable=*/false),
+			IO.do(updateKeyboard,/*enable=*/false),
+		]
 	);
 }
 
 function *onNextPlayLetterToggleOn(viewContext,evt) {
-	var radioEl = yield matches("input[type=radio]",evt.target) ? evt.target : undefined;
+	var radioEl = (yield matches("input[type=radio]",evt.target)) ? evt.target : undefined;
 
 	// toggling on a letter?
 	if (radioEl) {
+		yield IO.do(scrollDownPlayArea);
 		return IO.do(updatePlayMode,/*nextPlayMode=*/1);
 	}
 }
@@ -386,6 +530,7 @@ function *onNextPlayLetterToggleOff({ state, },evt) {
 }
 
 function *onStartInsertLetter(viewContext) {
+	yield IO.do(scrollDownPlayArea);
 	return IO.do(updatePlayMode,/*nextPlayMode=*/3);
 }
 
@@ -424,34 +569,67 @@ function *onRemoveLetter({ nextPlayFormEl, state, },evt) {
 	return IO.do(updatePlayMode,/*nextPlayMode=*/5);
 }
 
-function *onResetWord(viewContext) {
+function *onResetWord({
+	playAreaEl,
+	state: {
+		maxWordLength,
+	}
+}) {
 	yield IO.do(renderNextPlayWord);
+	yield setCSSVar("max-letter-count",maxWordLength,playAreaEl);
+	yield IO.do(scrollDownPlayArea);
 	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
 
-function *onPlayWord({ state, }) {
+function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 	if (
 		[ 2, 5, ].includes(state.playMode) &&
 		!state.playedWords.includes(state.pendingNextWord)
 	) {
-		state.playedWords.push(state.pendingNextWord);
-		yield IO.do(renderPlayedWords);
-		yield IO.do(renderNextPlayWord);
-		yield IO.do(updatePlayMode,/*nextPlayMode=*/0);
+		let wordAllowed = yield IO.do(checkNextWord,state.playedWords,state.pendingNextWord);
+
+		if (wordAllowed) {
+			state.maxWordLength = Math.max(state.maxWordLength,state.pendingNextWord.length);
+			state.playedWords.push(state.pendingNextWord);
+			yield IO.do(renderPlayedWords);
+
+			if (state.pendingNextWord.length == 1) {
+				yield addClass("complete",playedWordsEl);
+				yield addClass("hidden",nextPlayEl);
+				let nextPlayWordEl = yield findElement(".word",nextPlayEl);
+				yield setElAttr("aria-label","",nextPlayWordEl);
+				yield setInnerHTML("",nextPlayWordEl);
+				yield IO.do(scrollDownPlayArea);
+				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
+			}
+			else {
+				yield IO.do(renderNextPlayWord);
+				yield IO.do(scrollDownPlayArea);
+				yield IO.do(updatePlayMode,/*nextPlayMode=*/0);
+
+				// cheating at the game (temporarily)
+				console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
+			}
+		}
+		else {
+			console.error(`Word '${state.pendingNextWord}' not allowed.`);
+		}
 	}
 }
 
 function *onScreenKeyboardClick(viewContext,evt) {
-	var keyboardBtn = yield matches("#keyboard > form > button",evt.target) ? evt.target : undefined;
+	var keyboardBtn = (yield matches("#keyboard > form > button",evt.target)) ? evt.target : undefined;
 	if (keyboardBtn) {
 		let letter = yield getInnerText(keyboardBtn);
-		return IO.do(setLetter,letter);
+		yield IO.do(setLetter,letter);
+		return IO.do(scrollDownPlayArea);
 	}
 }
 
 function *onKeyboard(viewContext,evt) {
 	if (/^[a-z]$/i.test(evt.key)) {
-		return IO.do(setLetter,evt.key);
+		yield IO.do(setLetter,evt.key);
+		return IO.do(scrollDownPlayArea);
 	}
 }
 
@@ -500,6 +678,10 @@ function *updateKeyboard({ keyboardBtns, },enable) {
 	return IO.do(updateElements,keyboardBtns,enable);
 }
 
+function *scrollDownPlayArea({ playAreaEl, }) {
+	return setElProp("scrollTop",1E9,playAreaEl);
+}
+
 // compute the vw/vh units more reliably than CSS does itself
 function *computeViewportDimensions({ doc, }) {
 	var docEl = doc.documentElement;
@@ -507,6 +689,7 @@ function *computeViewportDimensions({ doc, }) {
 	var height = Math.max(400,docEl.clientHeight);
 	yield setCSSVar("vw-unit",`${(width / 100).toFixed(1)}px`,docEl);
 	yield setCSSVar("vh-unit",`${(height / 100).toFixed(1)}px`,docEl);
+	return IO.do(scrollDownPlayArea);
 }
 
 function *listenToScreenOrientationChanges(viewContext) {
