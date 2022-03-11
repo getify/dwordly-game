@@ -1,8 +1,8 @@
 :root {
 	--vh-unit: 1vh;
 	--vw-unit: 1vw;
+	--max-play-width: calc(var(--vw-unit) * 90);
 	--max-play-height: calc(var(--vh-unit) * 75);
-	--max-play-width: calc(var(--vw-unit) * 95);
 	--play-width: min(var(--max-play-width),var(--max-play-height) * 0.75);
 	--play-height: min(var(--max-play-height),var(--play-width) * 1.33);
 	--horz-unit: calc(var(--play-width) / 100);
@@ -397,4 +397,25 @@ menu#main-menu > li button {
 #keyboard > form {
 	margin: 0;
 	padding: 0;
+}
+
+#message-banner {
+	display: block;
+	position: fixed;
+	background-color: #000;
+	color: #fff;
+	font-weight: bold;
+	font-size: calc(var(--horz-unit) * 8);
+	width: 60%;
+	min-width: calc(var(--play-width) * 0.7);
+	max-width: var(--play-width);
+	left: 50%;
+	top: calc(var(--vert-unit) * 2);
+	transform: translateX(-50%);
+	padding: calc(var(--horz-unit) * 4);
+	text-align: center;
+}
+
+#message-banner.hidden {
+	display: none;
 }

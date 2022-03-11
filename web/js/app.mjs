@@ -63,6 +63,7 @@ function *main({ window: win, document: doc, } = {}) {
 		doc,
 
 		// get DOM element references
+		messageBanner: yield getElement("message-banner"),
 		menuToggleBtn: yield getElement("menu-toggle-btn"),
 		mainMenuEl: yield getElement("main-menu"),
 		playAreaEl: yield getElement("play-area"),
@@ -197,6 +198,7 @@ function *onToggleMainMenu(viewContext) {
 
 	// main menu currently closed?
 	if (yield matches(".hidden",mainMenuEl)) {
+		yield IO.do(hideMessageBanner);
 		yield removeClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","false",mainMenuEl);
 		yield setElAttr("aria-expanded","true",menuToggleBtn);
@@ -276,6 +278,8 @@ function *onNewGame({ state, }) {
 
 	// cheating at the game (temporarily)
 	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
+
+	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
 
 function *renderPlayedWords({
@@ -434,6 +438,9 @@ function *updatePlayMode(
 
 	// make sure the main menu is closed
 	yield IO.do(closeMainMenu);
+
+	// hide message banner
+	yield IO.do(hideMessageBanner);
 
 	return match(
 		// initial (or reset) state?
@@ -608,6 +615,7 @@ function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 				yield setInnerHTML("",nextPlayWordEl);
 				yield IO.do(scrollDownPlayArea);
 				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
+				yield IO.do(showMessageBanner,"GAME OVER!");
 			}
 		}
 		else {
@@ -681,11 +689,21 @@ function *scrollDownPlayArea({ playAreaEl, }) {
 	return setElProp("scrollTop",1E9,playAreaEl);
 }
 
+function *showMessageBanner({ messageBanner, },message) {
+	yield setInnerText(message,messageBanner);
+	yield removeClass("hidden",messageBanner);
+}
+
+function *hideMessageBanner({ messageBanner, }) {
+	yield addClass("hidden",messageBanner);
+	yield setInnerHTML("",messageBanner);
+}
+
 // compute the vw/vh units more reliably than CSS does itself
 function *computeViewportDimensions({ doc, }) {
 	var docEl = doc.documentElement;
-	var width = Math.max(400,docEl.clientWidth);
-	var height = Math.max(400,docEl.clientHeight);
+	var width = Math.max(300,docEl.clientWidth);
+	var height = Math.max(300,docEl.clientHeight);
 	yield setCSSVar("vw-unit",`${(width / 100).toFixed(1)}px`,docEl);
 	yield setCSSVar("vh-unit",`${(height / 100).toFixed(1)}px`,docEl);
 	return IO.do(scrollDownPlayArea);
