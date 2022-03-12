@@ -68,6 +68,8 @@ function *main({ window: win, document: doc, } = {}) {
 		mainMenuEl: yield getElement("main-menu"),
 		playAreaEl: yield getElement("play-area"),
 		playedWordsEl: yield getElement("played-words"),
+		playedWordsListEl: yield getElement("played-words-list"),
+		undoBtn: yield getElement("undo-btn"),
 		nextPlayEl: yield getElement("next-play"),
 		playActionBtnsEl: yield getElement("play-action-buttons"),
 		insertLetterBtn: yield getElement("insert-letter-btn"),
@@ -99,6 +101,7 @@ function *runApp({
 	doc,
 	menuToggleBtn,
 	mainMenuEl,
+	undoBtn,
 	insertLetterBtn,
 	playWordBtn,
 	resetWordBtn,
@@ -144,6 +147,11 @@ function *runApp({
 			IOx.onEvent(nextPlayFormEl,"submit"),
 			IOx.onEvent(keyboardFormEl,"submit")
 		]),
+	]);
+
+	// handle undo button clicks
+	yield doIOxBackground(onUndoWord,[
+		IOx.onEvent(undoBtn,"click"),
 	]);
 
 	// handle toggles of next-play letters
@@ -260,7 +268,7 @@ function *getSelectedDifficulty({ difficultySelectorEls, }) {
 	}
 }
 
-function *onNewGame({ state, }) {
+function *onNewGame({ playAreaEl, state, }) {
 	yield IO.do(closeMainMenu);
 
 	var difficulty = yield IO.do(getSelectedDifficulty);
@@ -279,24 +287,26 @@ function *onNewGame({ state, }) {
 	// cheating at the game (temporarily)
 	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
 
+	yield removeClass("hidden",playAreaEl);
+
 	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
 
 function *renderPlayedWords({
 	playAreaEl,
 	playedWordsEl,
+	playedWordsListEl,
 	state: {
 		maxWordLength,
 		playedWords,
 	},
 }) {
 	yield removeClass("complete",playedWordsEl);
-	yield setCSSVar("played-words-count",playedWords.length,playAreaEl);
 	yield setCSSVar("max-letter-count",maxWordLength,playAreaEl);
-	yield setInnerHTML("",playedWordsEl);
+	yield setInnerHTML("",playedWordsListEl);
 
 	for (let [idx,word] of playedWords.entries()) {
-		let wordEl = yield createElement("div");
+		let wordEl = yield createElement("li");
 		yield addClass("word",wordEl);
 		yield setElAttr("aria-label",`Word: ${word}`);
 
@@ -311,15 +321,7 @@ function *renderPlayedWords({
 			yield appendChild(wordEl,letterEl);
 		}
 
-		yield appendChild(playedWordsEl,wordEl);
-
-		// add the empty div grid-column placeholder?
-		if (idx == 0) {
-			let placeholderEl = yield createElement("div");
-			let commentEl = yield IO(({ doc, }) => doc.createComment("grid placeholder"));
-			yield appendChild(placeholderEl,commentEl);
-			yield appendChild(playedWordsEl,placeholderEl);
-		}
+		yield appendChild(playedWordsListEl,wordEl);
 	}
 }
 
@@ -589,7 +591,13 @@ function *onResetWord({
 	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
 
-function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
+function *onPlayWord({
+	playedWordsEl,
+	playedWordsListEl,
+	undoBtn,
+	nextPlayEl,
+	state,
+}) {
 	if ([ 2, 5, ].includes(state.playMode)) {
 		let wordAllowed = yield IO.do(checkNextWord,state.playedWords,state.pendingNextWord);
 
@@ -597,6 +605,9 @@ function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 			state.maxWordLength = Math.max(state.maxWordLength,state.pendingNextWord.length);
 			state.playedWords.push(state.pendingNextWord);
 			yield IO.do(renderPlayedWords);
+
+			// make sure undo button is available
+			yield enableEl(undoBtn);
 
 			let moreMovedAllowed = yield IO.do(movesPossible,state.playedWords);
 			if (moreMovedAllowed) {
@@ -621,6 +632,42 @@ function *onPlayWord({ playedWordsEl, nextPlayEl, state, }) {
 		else {
 			console.error(`Word '${state.pendingNextWord}' not allowed.`);
 		}
+	}
+}
+
+function *onUndoWord({
+	playedWordsEl,
+	undoBtn,
+	nextPlayEl,
+	state,
+}) {
+	if (state.playedWords.length > 1) {
+		state.playedWords.pop();
+
+		let maxWordLength = 0;
+		for (let word of state.playedWords) {
+			if (word.length > maxWordLength) {
+				maxWordLength = word.length;
+			}
+		}
+		state.maxWordLength = maxWordLength;
+
+		// need to disable the undo button now?
+		if (state.playedWords.length == 1) {
+			yield disableEl(undoBtn);
+		}
+
+		// if the game was complete, make sure
+		// to undo the associated styling
+		yield removeClass("complete",playedWordsEl);
+		yield removeClass("hidden",nextPlayEl);
+
+		// re-render the playable game area
+		yield IO.do(renderPlayedWords);
+		yield IO.do(renderNextPlayWord);
+		yield IO.do(scrollDownPlayArea);
+
+		return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 	}
 }
 

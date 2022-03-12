@@ -37,8 +37,13 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" aria-role="menuitem" aria-label="select hard game mode"><label for="hard-difficulty"> hard</label>
 	</li>
 </menu>
-<div id="play-area">
-	<div id="played-words"></div>
+<div id="play-area" class="hidden">
+	<div id="played-words">
+		<ul id="played-words-list"></ul>
+		<div>
+			<button type="button" id="undo-btn" disabled>undo</button>
+		</div>
+	</div>
 	<div id="next-play"><form>
 		<div class="word"></div>
 		<div id="play-action-buttons">

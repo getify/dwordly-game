@@ -136,8 +136,7 @@ menu#main-menu > li button {
 }
 
 #play-area {
-	--played-words-count: 2;
-	--max-letter-count: 5;
+	--max-letter-count: 4;
 
 	/* N = play-width */
 	/* M = max-letter-count */
@@ -159,6 +158,8 @@ menu#main-menu > li button {
 	--letter-insert-btn-size: calc(var(--letter-spacing) * 1.6);
 	--letter-remove-btn-size: calc(var(--letter-spacing) * 1.6);
 
+	--bottom-spacing: calc(var(--vh-unit) * 8);
+
 	grid-area: play-area;
 	align-self: end;
 	position: relative;
@@ -169,43 +170,74 @@ menu#main-menu > li button {
 	overflow-y: overlay;
 }
 
-#played-words, #next-play {
+#play-area.hidden {
+	display: none;
+}
+
+#played-words, #next-play > form {
 	position: relative;
 	display: grid;
 	grid-template-columns: var(--word-size) var(--play-action-gutter-size);
 	grid-template-rows: min-content;
 	gap: var(--letter-spacing) calc(var(--letter-spacing) / 2);
 	width: var(--play-width);
-	margin: 0 auto;
 }
 
 #played-words {
-	margin-top: calc(var(--letter-spacing) / 2);
+	margin: calc(var(--letter-spacing) / 2) auto 0 auto;
 	padding-bottom: calc(var(--letter-spacing) / 2);
 	border-bottom: thin solid #999;
 }
 
+#played-words > div:nth-child(2) {
+	position: relative;
+	height: 100%;
+}
+
+#undo-btn {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	font-size: calc(var(--horz-unit) * 4);
+}
+
+#undo-btn:disabled {
+	display: none;
+}
+
+#played-words-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#played-words-list > li {
+	margin: calc(var(--letter-spacing) / 2) 0;
+	padding: 0;
+}
+
+#played-words-list > li:last-child {
+	margin-bottom: 0;
+}
+
 #played-words.complete {
-	margin-bottom: var(--letter-insert-btn-size);
+	margin-bottom: var(--bottom-spacing);
 	padding-bottom: 0;
 	border-bottom: thin solid rgba(0,0,0,0);
 }
 
-#played-words.complete > .word:last-child {
+#played-words.complete > #played-words-list > li.word:last-child {
 	padding-bottom: calc(var(--letter-spacing) / 2);
 	border-top: thin solid rgba(0,0,0,0);
 	border-bottom: thin solid rgba(0,0,0,0);
 }
 
-#played-words > div:nth-child(2) {
-	grid-row-start: 1;
-	grid-row-end: span var(--played-words-count);
-	grid-column-start: 2;
-}
-
 #next-play {
+	width: var(--play-width);
 	padding-top: calc(var(--letter-spacing) / 2);
-	margin-bottom: var(--letter-insert-btn-size);
+	margin: 0 auto var(--bottom-spacing) auto;
 }
 
 #next-play.hidden {
@@ -296,7 +328,7 @@ menu#main-menu > li button {
 	height: var(--letter-insert-btn-size);
 	font-size: calc(var(--letter-insert-btn-size) * 0.75);
 	font-weight: bold;
-	line-height: var(--letter-insert-btn-size);
+	line-height: var(--letter-insert-btn-size * 0.9);
 	border: thin #999 solid;
 	border-radius: 50%;
 	cursor: pointer;
@@ -318,17 +350,14 @@ menu#main-menu > li button {
 }
 
 #play-action-buttons {
-	position: absolute;
-	right: 0;
-	top: calc(var(--letter-size) / 2);
-	transform: translateY(-50%);
+	position: relative;
 	display: inline-flex;
 	justify-content: flex-end;
+	align-self: center;
 	gap: var(--play-action-btn-spacing);
 	flex-wrap: wrap;
 	width: var(--play-action-gutter-size);
 	height: min-content;
-	margin-bottom: var(--letter-spacing);
 }
 
 #play-action-buttons > button {
@@ -353,14 +382,14 @@ menu#main-menu > li button {
 	--key-width: calc(var(--play-width) / 11.8);
 	--key-height: calc(var(--key-width) * 1.8);
 	--key-spacing: calc(var(--key-width) / 5);
-	--bottom-margin: calc(var(--key-spacing) * 5);
+	--bottom-spacing: calc(var(--key-spacing) * 5);
 
 	grid-area: keyboard;
 
 	position: relative;
 	width: var(--play-width);
 	height: calc((var(--key-height) * 3) + (var(--key-spacing) * 2));
-	margin: 0 auto var(--bottom-margin) auto;
+	margin: 0 auto var(--bottom-spacing) auto;
 }
 
 #keyboard > form {
