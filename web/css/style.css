@@ -18,8 +18,6 @@ html {
 *::before,
 *::after {
 	box-sizing: inherit;
-	-ms-touch-action: none;
-	touch-action: none;
 	-webkit-user-select: none;
 	user-select: none;
 }
@@ -98,7 +96,7 @@ menu#main-menu {
 	list-style-type: none;
 	margin: 0;
 	padding: var(--menu-text-size);
-	padding-top: calc(var(--menu-text-size) * 1.5);
+	padding-top: calc(var(--menu-text-size) * 2.5);
 	background: #e3e3e3;
 	box-shadow: 4px 4px 8px 1px rgba(0,0,0,0.34);
 }
@@ -108,16 +106,18 @@ menu#main-menu.hidden {
 }
 
 menu#main-menu > #close-menu-btn {
+	--button-size: calc(var(--menu-text-size) * 1.4);
+
 	position: absolute;
-	top: calc(var(--menu-text-size) / 4);
-	right: calc(var(--menu-text-size) / 4);
-	width: var(--menu-text-size);
-	height: var(--menu-text-size);
+	top: calc(var(--button-size) / 4);
+	right: calc(var(--button-size) / 4);
+	width: var(--button-size);
+	height: var(--button-size);
 	font-weight: bold;
-	font-size: calc(var(--menu-text-size) * 0.85);
-	line-height: var(--menu-text-size);
-	padding: 0 calc(var(--menu-text-size) * 0.05);
-	border-radius: calc(var(--menu-text-size) * 0.3);
+	font-size: var(--button-size);
+	line-height: var(--button-size);
+	padding: 0 calc(var(--button-size) * 0.1);
+	border-radius: calc(var(--button-size) * 0.3);
 	border: thin solid #999;
 	cursor: pointer;
 }
@@ -128,6 +128,10 @@ menu#main-menu > li {
 	white-space: nowrap;
 	font-weight: bold;
 	font-size: var(--menu-text-size);
+}
+
+menu#main-menu > li:nth-of-type(2) {
+	margin-top: calc(var(--menu-text-size) * 0.75);
 }
 
 menu#main-menu > li button {
@@ -306,8 +310,8 @@ menu#main-menu > li button {
 	transform: translate(50%,75%);
 	width: var(--letter-remove-btn-size);
 	height: var(--letter-remove-btn-size);
-	font-size: calc(var(--letter-remove-btn-size) * 0.75);
-	line-height: var(--letter-remove-btn-size);
+	font-size: calc(var(--letter-remove-btn-size) * 1.2);
+	line-height: calc(var(--letter-remove-btn-size) * 0.5);
 	border: thin #999 solid;
 	border-radius: 50%;
 	cursor: pointer;
@@ -434,12 +438,12 @@ menu#main-menu > li button {
 	background-color: #000;
 	color: #fff;
 	font-weight: bold;
-	font-size: calc(var(--horz-unit) * 8);
+	font-size: calc(var(--horz-unit) * 5);
 	width: 60%;
 	min-width: calc(var(--play-width) * 0.7);
 	max-width: var(--play-width);
 	left: 50%;
-	top: calc(var(--vert-unit) * 2);
+	top: calc(var(--vert-unit) * 8);
 	transform: translateX(-50%);
 	padding: calc(var(--horz-unit) * 4);
 	text-align: center;

@@ -61,6 +61,7 @@ function *main({ window: win, document: doc, } = {}) {
 	var viewContext = {
 		win,
 		doc,
+		docEventsCaptured: null,
 
 		// get DOM element references
 		messageBanner: yield getElement("message-banner"),
@@ -211,9 +212,16 @@ function *onToggleMainMenu(viewContext) {
 		yield setElAttr("aria-hidden","false",mainMenuEl);
 		yield setElAttr("aria-expanded","true",menuToggleBtn);
 
-		// listen for all clicks on document (in capturing phase)
-		viewContext.docClickEvents = IOx.onEvent(doc,"click",{ evtOpts: { capture: true, }, });
-		return doIOxBackground(onDocClicks,[ viewContext.docClickEvents, ]);
+		// listen for doc events (outside menu) to close it
+		let { all: docEvents, } =
+			yield IO.do(initDocEventCapturing,/*subscribe=*/false);
+		return doIOxBackground(function *onDocEvent(viewContext,evt){
+			// click was NOT on the menu itself?
+			if (yield IO(() => !mainMenuEl.contains(evt.target))) {
+				yield IO.do(cancelEvent,evt);
+				return IO.do(closeMainMenu);
+			}
+		},[ docEvents, ]);
 	}
 	else {
 		return IO.do(closeMainMenu);
@@ -228,10 +236,7 @@ function *closeMainMenu(viewContext) {
 		yield addClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","true",mainMenuEl);
 		yield setElAttr("aria-expanded","false",menuToggleBtn);
-
-		// quit listening for document clicks
-		yield IO(({ docClickEvents, }) => docClickEvents.close());
-		viewContext.docClickEvents = null;
+		return IO.do(clearDocEventCapturing);
 	}
 }
 
@@ -249,13 +254,6 @@ function *onMainMenuClicks({ mainMenuEl, },evt) {
 				onNewGame,
 			]
 		);
-	}
-}
-
-function *onDocClicks({ mainMenuEl, },evt) {
-	if (yield IO(({ mainMenuEl, }) => !mainMenuEl.contains(evt.target))) {
-		yield IO.do(cancelEvent,evt);
-		return IO.do(closeMainMenu);
 	}
 }
 
@@ -384,7 +382,7 @@ function *renderNextPlayWord(
 		yield setElProp("type","button",removeBtn);
 		yield addClass("remove-letter-btn",removeBtn);
 		yield setElAttr("aria-label",`Remove the letter '${char}' from the word`,removeBtn);
-		yield setInnerText("🗑",removeBtn);
+		yield setInnerText("-",removeBtn);
 		yield disableEl(removeBtn);
 		yield appendChild(letterEl,removeBtn);
 
@@ -626,11 +624,11 @@ function *onPlayWord({
 				yield setInnerHTML("",nextPlayWordEl);
 				yield IO.do(scrollDownPlayArea);
 				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
-				yield IO.do(showMessageBanner,"GAME OVER!");
+				return IO.do(showMessageBanner,"GAME OVER!");
 			}
 		}
 		else {
-			console.error(`Word '${state.pendingNextWord}' not allowed.`);
+			return IO.do(showMessageBanner,"Not Allowed.");
 		}
 	}
 }
@@ -736,14 +734,60 @@ function *scrollDownPlayArea({ playAreaEl, }) {
 	return setElProp("scrollTop",1E9,playAreaEl);
 }
 
-function *showMessageBanner({ messageBanner, },message) {
+function *showMessageBanner({ doc, messageBanner, },message) {
 	yield setInnerText(message,messageBanner);
-	yield removeClass("hidden",messageBanner);
+	if (yield matches(".hidden",messageBanner)) {
+		yield removeClass("hidden",messageBanner);
+
+		// doc events close the message banner
+		let { all: docEvents, } =
+			yield IO.do(initDocEventCapturing,/*subscribe=*/true);
+		return doIOxBackground(hideMessageBanner,[ docEvents, ]);
+	}
 }
 
 function *hideMessageBanner({ messageBanner, }) {
-	yield addClass("hidden",messageBanner);
-	yield setInnerHTML("",messageBanner);
+	if (!(yield matches(".hidden",messageBanner))) {
+		yield addClass("hidden",messageBanner);
+		return setInnerHTML("",messageBanner);
+	}
+}
+
+function *initDocEventCapturing(viewContext,subscribe = true) {
+	if (!viewContext.docEventsCaptured) {
+		// listen for all clicks/keyboard events on document
+		// (in capturing phase)
+		let evts = {
+			click: IOx.onEvent(viewContext.doc,"click",{
+				evtOpts: { capture: true, },
+			}),
+			keydown: IOx.onEvent(viewContext.doc,"keydown",{
+				evtOps: { capture: true, },
+			}),
+			all: null,
+		};
+		evts.all = merge([ evts.click, evts.keydown, ]);
+		if (subscribe) {
+			yield doIOxBackground(clearDocEventCapturing,[ evts.all, ]);
+		}
+		viewContext.docEventsCaptured = evts;
+	}
+	return viewContext.docEventsCaptured;
+}
+
+function *clearDocEventCapturing(viewContext,evt) {
+	if (viewContext.docEventsCaptured) {
+		// hack to defer asynchronously
+		yield Promise.resolve();
+
+		// quit listening for click/keyboard events
+		yield IO(({ docEventsCaptured: { click, keydown, all, }, }) => {
+			click.close();
+			keydown.close();
+			all.close();
+		});
+		viewContext.docEventsCaptured = null;
+	}
 }
 
 // compute the vw/vh units more reliably than CSS does itself
