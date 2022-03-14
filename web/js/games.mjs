@@ -78,8 +78,27 @@ function *checkNextWord({ state: { neighbors, }, },words,nextWord) {
 	return (!words.includes(nextWord) && nextWords.includes(nextWord));
 }
 
-function scoreGame(game) {
-	return 10;
+function *scoreGame(viewContext,game) {
+	var score = 0;
+	var optimalGame = yield IO.do(findShortestPath,game[0]);
+
+	// 25% of the score: character count
+	var gameTotalCharCount = game.join("").length;
+	var optimalTotalCharCount = optimalGame.join("").length;
+	score += Math.min(25,(25 * (optimalTotalCharCount / gameTotalCharCount)));
+
+	// 25% of the score: length of the dwordly path
+	score += (25 * (
+		Math.min(game.length,optimalGame.length) /
+		Math.max(game.length,optimalGame.length)
+	));
+
+	// 50% of the score: length of final word
+	var gameFinalWordLength = game[game.length - 1].length;
+	var optimalFinalWordLength = optimalGame[optimalGame.length - 1].length;
+	score += Math.min(50,(50 * optimalFinalWordLength / gameFinalWordLength));
+
+	return Math.floor(score);
 }
 
 function *findShortestPath({ state: { neighbors, }, },word) {

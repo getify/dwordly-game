@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 <meta name="Description" content="A game where words dwindle down to the shortest possible">
 
-<link rel="stylesheet" href="css/style.css?1234">
+<link rel="stylesheet" href="css/style.css">
 <script>
 // compute the vw/vh units more reliably than CSS does itself
 if (document.documentElement && document.documentElement.style && document.documentElement.style.setProperty) {
@@ -22,7 +22,9 @@ if (document.documentElement && document.documentElement.style && document.docum
 <header>
 	<button type="button" id="menu-toggle-btn" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle main menu">☰</button>
 
-	<span>DWORDLY</span>
+	<span id="title" aria-label="Game title">DWORDLY</span>
+
+	<span id="game-score" class="hidden" aria-live="off" aria-label="Game score"></span>
 </header>
 <menu role="menu" id="main-menu" class="hidden" aria-hidden="true" aria-label="main menu">
 	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
@@ -61,7 +63,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<button type="button" disabled>Z</button><button type="button" disabled>X</button><button type="button" disabled>C</button><button type="button" disabled>V</button><button type="button" disabled>B</button><button type="button" disabled>N</button><button type="button" disabled>M</button>
 </form></div>
 
-<div id="message-banner" class="hidden"></div>
+<div id="message-banner" class="hidden" aria-live="off"></div>
 
 </body>
 

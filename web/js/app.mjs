@@ -64,6 +64,7 @@ function *main({ window: win, document: doc, } = {}) {
 		docEventsCaptured: null,
 
 		// get DOM element references
+		scoreEl: yield getElement("game-score"),
 		messageBanner: yield getElement("message-banner"),
 		menuToggleBtn: yield getElement("menu-toggle-btn"),
 		mainMenuEl: yield getElement("main-menu"),
@@ -275,6 +276,9 @@ function *onNewGame({ playAreaEl, state, }) {
 
 	state.maxWordLength = game[0].length;
 	state.playedWords = [ game[0], ];
+
+	// update the scoreboard
+	yield IO.do(updateGameScore);
 
 	// render the initial played-words list
 	yield IO.do(renderPlayedWords);
@@ -607,6 +611,9 @@ function *onPlayWord({
 			// make sure undo button is available
 			yield enableEl(undoBtn);
 
+			// update the scoreboard
+			yield IO.do(updateGameScore);
+
 			let moreMovedAllowed = yield IO.do(movesPossible,state.playedWords);
 			if (moreMovedAllowed) {
 				yield IO.do(renderNextPlayWord);
@@ -641,6 +648,9 @@ function *onUndoWord({
 }) {
 	if (state.playedWords.length > 1) {
 		state.playedWords.pop();
+
+		// update the scoreboard
+		yield IO.do(updateGameScore);
 
 		let maxWordLength = 0;
 		for (let word of state.playedWords) {
@@ -736,6 +746,7 @@ function *scrollDownPlayArea({ playAreaEl, }) {
 
 function *showMessageBanner({ doc, messageBanner, },message) {
 	yield setInnerText(message,messageBanner);
+	yield setElAttr("aria-live","polite",messageBanner);
 	if (yield matches(".hidden",messageBanner)) {
 		yield removeClass("hidden",messageBanner);
 
@@ -749,7 +760,27 @@ function *showMessageBanner({ doc, messageBanner, },message) {
 function *hideMessageBanner({ messageBanner, }) {
 	if (!(yield matches(".hidden",messageBanner))) {
 		yield addClass("hidden",messageBanner);
+		yield setElAttr("aria-live","off",messageBanner);
 		return setInnerHTML("",messageBanner);
+	}
+}
+
+function *updateGameScore({ scoreEl, state: { playedWords, }, }) {
+	if (playedWords.length > 1) {
+		yield setElAttr("aria-live","polite",scoreEl);
+		let score = yield IO.do(scoreGame,playedWords);
+		if (score > 85) {
+			yield addClass("good",scoreEl);
+		}
+		else {
+			yield removeClass("good",scoreEl);
+		}
+		return setInnerText(`${score}%`,scoreEl);
+	}
+	else {
+		yield setElAttr("aria-live","off",scoreEl);
+		yield removeClass("good",scoreEl);
+		return setInnerText("",scoreEl);
 	}
 }
 
