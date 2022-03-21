@@ -339,12 +339,10 @@ menu#main-menu > li input[type=radio] {
 	height: 100%;
 }
 
-#undo-btn {
+#undo-btn, #undo-all-btn {
 	--button-size: var(--letter-size);
 
 	position: absolute;
-	right: 0;
-	bottom: 0;
 	padding: 0;
 	margin: 0;
 	font-size: 0.001px;
@@ -355,21 +353,34 @@ menu#main-menu > li input[type=radio] {
 	border: none;
 	cursor: pointer;
 }
-#undo-btn::after {
+#undo-btn {
+	right: 0;
+	bottom: calc(var(--letter-spacing) + var(--letter-size));
+}
+#undo-all-btn {
+	right: 0;
+	top: calc(var(--letter-spacing) / 2);
+}
+#undo-btn::after, #undo-all-btn::after {
 	content: "";
 	display: block;
 	width: var(--button-size);
 	height: var(--button-size);
-	background-image: url(../images/icon-undo.svg);
 	background-position: 50% 50%;
 	background-size: calc(var(--button-size) * 0.8);
 	background-repeat: no-repeat;
 }
-#undo-btn:focus {
+#undo-btn::after {
+	background-image: url(../images/icon-undo.svg);
+}
+#undo-all-btn::after {
+	background-image: url(../images/icon-undo-all.svg);
+}
+#undo-btn:focus, #undo-all-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: 0.8;
 }
-#undo-btn:disabled {
+#undo-btn:disabled, #undo-all-btn:disabled {
 	display: none;
 }
 

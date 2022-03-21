@@ -71,6 +71,7 @@ function *main({ window: win, document: doc, } = {}) {
 		playAreaEl: yield getElement("play-area"),
 		playedWordsEl: yield getElement("played-words"),
 		playedWordsListEl: yield getElement("played-words-list"),
+		undoAllBtn: yield getElement("undo-all-btn"),
 		undoBtn: yield getElement("undo-btn"),
 		nextPlayEl: yield getElement("next-play"),
 		playActionBtnsEl: yield getElement("play-action-buttons"),
@@ -103,6 +104,7 @@ function *runApp({
 	doc,
 	menuToggleBtn,
 	mainMenuEl,
+	undoAllBtn,
 	undoBtn,
 	insertLetterBtn,
 	playWordBtn,
@@ -152,6 +154,9 @@ function *runApp({
 	]);
 
 	// handle undo button clicks
+	yield doIOxBackground(onUndoAllWords,[
+		IOx.onEvent(undoAllBtn,"click"),
+	]);
 	yield doIOxBackground(onUndoWord,[
 		IOx.onEvent(undoBtn,"click"),
 	]);
@@ -267,7 +272,7 @@ function *getSelectedDifficulty({ difficultySelectorEls, }) {
 	}
 }
 
-function *onNewGame({ playAreaEl, state, }) {
+function *onNewGame({ playAreaEl, undoAllBtn, undoBtn, state, }) {
 	yield IO.do(closeMainMenu);
 
 	var difficulty = yield IO.do(getSelectedDifficulty);
@@ -290,6 +295,8 @@ function *onNewGame({ playAreaEl, state, }) {
 	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
 
 	yield removeClass("hidden",playAreaEl);
+	yield disableEl(undoAllBtn);
+	yield disableEl(undoBtn);
 
 	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
@@ -594,6 +601,7 @@ function *onResetWord({
 function *onPlayWord({
 	playedWordsEl,
 	playedWordsListEl,
+	undoAllBtn,
 	undoBtn,
 	nextPlayEl,
 	state,
@@ -606,7 +614,10 @@ function *onPlayWord({
 			state.playedWords.push(state.pendingNextWord);
 			yield IO.do(renderPlayedWords);
 
-			// make sure undo button is available
+			// make sure undo/undo-all buttons are available
+			if (state.playedWords.length >= 3) {
+				yield enableEl(undoAllBtn);
+			}
 			yield enableEl(undoBtn);
 
 			// update the scoreboard
@@ -638,8 +649,41 @@ function *onPlayWord({
 	}
 }
 
+function *onUndoAllWords({
+	playedWordsEl,
+	undoAllBtn,
+	undoBtn,
+	nextPlayEl,
+	state,
+}) {
+	if (state.playedWords.length > 1) {
+		state.playedWords.length = 1;
+
+		// update the scoreboard
+		yield IO.do(updateGameScore);
+
+		state.maxWordLength = state.playedWords[state.playedWords.length - 1].length;
+
+		yield disableEl(undoAllBtn);
+		yield disableEl(undoBtn);
+
+		// if the game was complete, make sure
+		// to undo the associated styling
+		yield removeClass("complete",playedWordsEl);
+		yield removeClass("hidden",nextPlayEl);
+
+		// re-render the playable game area
+		yield IO.do(renderPlayedWords);
+		yield IO.do(renderNextPlayWord);
+		yield IO.do(scrollDownPlayArea);
+
+		return IO.do(updatePlayMode,/*nextPlayMode=*/0);
+	}
+}
+
 function *onUndoWord({
 	playedWordsEl,
+	undoAllBtn,
 	undoBtn,
 	nextPlayEl,
 	state,
@@ -650,6 +694,7 @@ function *onUndoWord({
 		// update the scoreboard
 		yield IO.do(updateGameScore);
 
+		// re-compute the max word length
 		let maxWordLength = 0;
 		for (let word of state.playedWords) {
 			if (word.length > maxWordLength) {
@@ -658,9 +703,13 @@ function *onUndoWord({
 		}
 		state.maxWordLength = maxWordLength;
 
-		// need to disable the undo button now?
-		if (state.playedWords.length == 1) {
-			yield disableEl(undoBtn);
+		// need to disable the undo/undo-all buttons now?
+		if (state.playedWords.length <= 2) {
+			yield disableEl(undoAllBtn);
+
+			if (state.playedWords.length == 1) {
+				yield disableEl(undoBtn);
+			}
 		}
 
 		// if the game was complete, make sure
