@@ -20,7 +20,9 @@ if (document.documentElement && document.documentElement.style && document.docum
 <body>
 
 <header>
-	<button type="button" id="menu-toggle-btn" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle main menu">☰</button>
+	<button type="button" id="menu-toggle-btn" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle main menu"></button>
+
+	<button type="button" id="help-btn" aria-controls="help-popup" aria-expanded="false" aria-label="Open help and game instructions"></button>
 
 	<span id="title" aria-label="Game title">DWORDLY</span>
 
@@ -43,15 +45,15 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<div id="played-words">
 		<ul id="played-words-list"></ul>
 		<div>
-			<button type="button" id="undo-btn" disabled>undo</button>
+			<button type="button" id="undo-btn" disabled></button>
 		</div>
 	</div>
 	<div id="next-play"><form>
 		<div class="word"></div>
 		<div id="play-action-buttons">
-			<button type="button" id="insert-letter-btn" aria-label="Insert a letter" disabled>+</button>
-			<button type="button" id="play-word-btn" aria-label="Play this word" disabled>✓</button>
-			<button type="button" id="reset-word-btn" aria-label="Reset this play" disabled>↺</button>
+			<button type="button" id="insert-letter-btn" aria-label="Insert a letter" disabled></button>
+			<button type="button" id="play-word-btn" aria-label="Play this word" disabled></button>
+			<button type="button" id="reset-word-btn" aria-label="Reset this play" disabled></button>
 		</div>
 	</form></div>
 </div>

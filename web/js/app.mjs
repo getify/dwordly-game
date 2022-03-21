@@ -386,7 +386,6 @@ function *renderNextPlayWord(
 		yield setElProp("type","button",removeBtn);
 		yield addClass("remove-letter-btn",removeBtn);
 		yield setElAttr("aria-label",`Remove the letter '${char}' from the word`,removeBtn);
-		yield setInnerText("-",removeBtn);
 		yield disableEl(removeBtn);
 		yield appendChild(letterEl,removeBtn);
 
@@ -396,7 +395,6 @@ function *renderNextPlayWord(
 			yield addClass("insert-here-btn",insertHereBtn);
 			yield addClass("insert-at-end",insertHereBtn);
 			yield setElAttr("aria-label",`Insert new letter at the end, after '${char}'`,insertHereBtn);
-			yield setInnerText("+",insertHereBtn);
 			yield disableEl(insertHereBtn);
 			yield appendChild(letterEl,insertHereBtn);
 		}
