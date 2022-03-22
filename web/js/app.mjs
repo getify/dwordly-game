@@ -451,10 +451,15 @@ function *updatePlayMode(
 	// hide message banner
 	yield IO.do(hideMessageBanner);
 
+	console.log(state.maxDictWordLength);
+
 	return match(
 		// initial (or reset) state?
 		playMode == 0, $=>[
-			enableEl(insertLetterBtn),
+			((state.playedWords[state.playedWords.length - 1].length >= state.maxDictWordLength) ?
+				disableEl(insertLetterBtn) :
+				enableEl(insertLetterBtn)
+			),
 			disableEl(playWordBtn),
 			disableEl(resetWordBtn),
 			IO.do(updateNextPlayLetters,/*enable=*/true),
@@ -644,7 +649,7 @@ function *onPlayWord({
 			}
 		}
 		else {
-			return IO.do(showMessageBanner,"Not Allowed.");
+			return IO.do(showMessageBanner,"Not Allowed");
 		}
 	}
 }

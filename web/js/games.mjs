@@ -32,6 +32,12 @@ function *loadDictionary({ state, }) {
 	if (!state.dict) {
 		state.dict = yield requestJSON("/dictionary.json");
 		state.neighbors = findAllNeighbors(state.dict);
+		state.maxDictWordLength = 0;
+		for (let { text: word, } of state.dict) {
+			if (word.length > state.maxDictWordLength) {
+				state.maxDictWordLength = word.length;
+			}
+		}
 	}
 }
 
