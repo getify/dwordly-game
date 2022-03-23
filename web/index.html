@@ -30,27 +30,27 @@ if (document.documentElement && document.documentElement.style && document.docum
 </header>
 <menu role="menu" id="main-menu" class="hidden" aria-hidden="true" aria-label="main menu">
 	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
-	<li aria-role="none"><button type="button" id="new-game-btn" aria-role="menuitem" aria-label="start a new game">new game</button></li>
-	<li aria-role="none">
-		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" aria-role="menuitem" aria-label="select easy game mode"><label for="easy-difficulty"> easy</label>
+	<li role="none"><button type="button" id="new-game-btn" role="menuitem" aria-label="start a new game">new game</button></li>
+	<li role="none">
+		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" role="menuitem" aria-label="select easy game mode"><label for="easy-difficulty"> easy</label>
 	</li>
-	<li aria-role="none">
-		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" aria-role="menuitem" aria-label="select medium game mode" checked><label for="medium-difficulty"> medium</label>
+	<li role="none">
+		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" role="menuitem" aria-label="select medium game mode" checked><label for="medium-difficulty"> medium</label>
 	</li>
-	<li aria-role="none">
-		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" aria-role="menuitem" aria-label="select hard game mode"><label for="hard-difficulty"> hard</label>
+	<li role="none">
+		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" role="menuitem" aria-label="select hard game mode"><label for="hard-difficulty"> hard</label>
 	</li>
 </menu>
-<div id="play-area" class="hidden">
+<div id="play-area" class="hidden" aria-label="Play the game here">
 	<div id="played-words">
-		<ul id="played-words-list"></ul>
+		<ul id="played-words-list" aria-label="All the words played so far in this game"></ul>
 		<div>
-			<button type="button" id="undo-all-btn" disabled></button>
-			<button type="button" id="undo-btn" disabled></button>
+			<button type="button" id="undo-all-btn" aria-label="Undo all played words to restart current game" disabled></button>
+			<button type="button" id="undo-btn" aria-label="Undo the most recent played word" disabled></button>
 		</div>
 	</div>
-	<div id="next-play"><form>
-		<div class="word"></div>
+	<div id="next-play"><form role="none">
+		<div class="word" aria-label="The next word move being played"></div>
 		<div id="play-action-buttons">
 			<button type="button" id="insert-letter-btn" aria-label="Insert a letter" disabled></button>
 			<button type="button" id="play-word-btn" aria-label="Play this word" disabled></button>
@@ -58,7 +58,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 		</div>
 	</form></div>
 </div>
-<div id="keyboard" aria-label="On-screen keyboard"><form>
+<div id="keyboard" aria-label="On-screen keyboard"><form role="none">
 	<button type="button" disabled>Q</button><button type="button" disabled>W</button><button type="button" disabled>E</button><button type="button" disabled>R</button><button type="button" disabled>T</button><button type="button" disabled>Y</button><button type="button" disabled>U</button><button type="button" disabled>I</button><button type="button" disabled>O</button><button type="button" disabled>P</button>
 
 	<button type="button" disabled>A</button><button type="button" disabled>S</button><button type="button" disabled>D</button><button type="button" disabled>F</button><button type="button" disabled>G</button><button type="button" disabled>H</button><button type="button" disabled>J</button><button type="button" disabled>K</button><button type="button" disabled>L</button>
@@ -67,6 +67,49 @@ if (document.documentElement && document.documentElement.style && document.docum
 </form></div>
 
 <div id="message-banner" class="hidden" aria-live="off"></div>
+
+<div id="help-popup" class="hidden">
+	<button type="button" id="close-help-btn" aria-label="Close the help popup"></button>
+
+	<p>Dwindle the starting word down to a one-letter word, in the fewest moves.<p>
+	<p>No lucky guessing here&mdash;unlike other word games!&mdash;just clever word play.</p>
+	<p>Keep playing games from 3 difficulty levels.</p>
+
+	<hr>
+
+	<ul id="help-content-tabs" role="tablist">
+		<li><input type="radio" name="help-content-selector" id="help-example-tab" aria-controls="help-example-content" aria-selected="true" role="tab" checked> <label for="help-example-tab" id="help-example-tab-text" aria-label="See example game play">examples</label></li>
+
+		<li><input type="radio" name="help-content-selector" id="help-instructions-tab" aria-controls="help-instructions-content" aria-selected="false" role="tab"> <label for="help-instructions-tab" id="help-instructions-tab-text" aria-label="See instructions for how to play the game">how to</label></li>
+
+		<li><input type="radio" name="help-content-selector" id="help-about-tab" aria-controls="help-about-content" aria-selected="false" role="tab"> <label for="help-about-tab" id="help-about-tab-text" aria-label="See information about this game and its creator">about</label></li>
+	</ul>
+	<section id="help-example-content" aria-labelledby="help-example-tab-text" role="tabpanel">
+		<div id="help-example-1" aria-label="Game example: TON > TIN > IN > I">
+			TON
+			TIN
+			IN
+			I
+		</div>
+		<div id="help-example-2" aria-label="Game example: SOUR > OUR > OAR > MAR > ...">
+			SOUR
+			OUR
+			OAR
+			MAR
+		</div>
+	</section>
+	<section id="help-instructions-content" class="hidden" aria-labelledby="help-instructions-tab-text" role="tabpanel">
+		<p>Tap <i id="help-letter" aria-label="Letter in the next-play area that can be activated"></i> to activate a letter <i id="help-activated-letter" aria-label="Activated letter"></i>. Then change the letter <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> or tap <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
+		<p>Tap <i id="help-insert-letter" aria-label="Start letter-insert mode"></i> and <i id="help-insert-letter-position" aria-label="Choose where a new letter should be inserted: start of word, end of word, or between two letters"></i> to insert a new letter.</p>
+		<p>Tap <i id="help-play-word" aria-label="Attempt to play the current word"></i> to complete a move if it's a valid word. Tap <i id="help-reset-move" aria-label="Reset current word"></i> to reset a move.</p>
+		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different words to improve your score <strong>%</strong> percent.</p>
+	</section>
+	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
+		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
+		<p><strong>NOT</strong> affiliated in any way with Wordle.</p>
+		<p>&copy; 2022 Kyle Simpson</p>
+	</section>
+</div>
 
 </body>
 

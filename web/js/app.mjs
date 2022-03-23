@@ -9,6 +9,7 @@ import {
 import IOx from "monio/iox";
 import {
 	merge,
+	filterIn,
 } from "monio/iox/helpers";
 
 import {
@@ -64,8 +65,12 @@ function *main({ window: win, document: doc, } = {}) {
 		docEventsCaptured: null,
 
 		// get DOM element references
+		helpBtn: yield getElement("help-btn"),
 		scoreEl: yield getElement("game-score"),
 		messageBanner: yield getElement("message-banner"),
+		helpPopupEl: yield getElement("help-popup"),
+		helpCloseBtn: yield getElement("close-help-btn"),
+		helpContentTabsEl: yield getElement("help-content-tabs"),
 		menuToggleBtn: yield getElement("menu-toggle-btn"),
 		mainMenuEl: yield getElement("main-menu"),
 		playAreaEl: yield getElement("play-area"),
@@ -104,6 +109,9 @@ function *runApp({
 	doc,
 	menuToggleBtn,
 	mainMenuEl,
+	helpBtn,
+	helpCloseBtn,
+	helpContentTabsEl,
 	undoAllBtn,
 	undoBtn,
 	insertLetterBtn,
@@ -140,6 +148,21 @@ function *runApp({
 		IOx.onEvent(menuToggleBtn,"click"),
 	]);
 
+	// handle help button
+	yield doIOxBackground(onToggleHelp,[
+		IOx.onEvent(helpBtn,"click"),
+	]);
+
+	// handle help close button
+	yield doIOxBackground(closeHelp,[
+		IOx.onEvent(helpCloseBtn,"click"),
+	]);
+
+	// handle help content tab switching
+	yield doIOxBackground(onSwitchHelpContentTab,[
+		IOx.onEvent(helpContentTabsEl,"change"),
+	]);
+
 	// handle main-menu clicks
 	yield doIOxBackground(onMainMenuClicks,[
 		IOx.onEvent(mainMenuEl,"click"),
@@ -149,7 +172,7 @@ function *runApp({
 	yield doIOxBackground(cancelEvent,[
 		merge([
 			IOx.onEvent(nextPlayFormEl,"submit"),
-			IOx.onEvent(keyboardFormEl,"submit")
+			IOx.onEvent(keyboardFormEl,"submit"),
 		]),
 	]);
 
@@ -162,7 +185,7 @@ function *runApp({
 	]);
 
 	// handle toggles of next-play letters
-	yield doIOxBackground(onNextPlayLetterToggleOn,[
+	yield doIOxBackground(onToggleOnNextPlayLetter,[
 		IOx.onEvent(nextPlayFormEl,"change"),
 	]);
 
@@ -208,12 +231,11 @@ function *runApp({
 	yield IO.do(updatePlayMode,/*nextPlayMode=*/state.playMode);
 }
 
-function *onToggleMainMenu(viewContext) {
-	var { doc, menuToggleBtn, mainMenuEl, } = viewContext;
-
+function *onToggleMainMenu({ doc, menuToggleBtn, mainMenuEl, }) {
 	// main menu currently closed?
 	if (yield matches(".hidden",mainMenuEl)) {
 		yield IO.do(hideMessageBanner);
+		yield IO.do(closeHelp);
 		yield removeClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","false",mainMenuEl);
 		yield setElAttr("aria-expanded","true",menuToggleBtn);
@@ -223,18 +245,18 @@ function *onToggleMainMenu(viewContext) {
 			yield IO.do(initDocEventCapturing,/*subscribe=*/false);
 		return doIOxBackground(function *onDocEvent(viewContext,evt){
 			// click was NOT on the menu itself?
-			if (yield IO(() => !mainMenuEl.contains(evt.target))) {
+			if (!mainMenuEl.contains(evt.target)) {
 				yield IO.do(cancelEvent,evt);
-				return IO.do(closeMainMenu);
+				return IO.do(closeMenu);
 			}
 		},[ docEvents, ]);
 	}
 	else {
-		return IO.do(closeMainMenu);
+		return IO.do(closeMenu);
 	}
 }
 
-function *closeMainMenu(viewContext) {
+function *closeMenu(viewContext) {
 	var { menuToggleBtn, mainMenuEl, } = viewContext;
 
 	// main menu visible?
@@ -242,6 +264,66 @@ function *closeMainMenu(viewContext) {
 		yield addClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","true",mainMenuEl);
 		yield setElAttr("aria-expanded","false",menuToggleBtn);
+		return IO.do(clearDocEventCapturing);
+	}
+}
+
+function *onToggleHelp({ doc, helpBtn, helpPopupEl, }) {
+	// help popup currently closed?
+	if (yield matches(".hidden",helpPopupEl)) {
+		yield IO.do(hideMessageBanner);
+		yield IO.do(closeMenu);
+
+		yield removeClass("hidden",helpPopupEl);
+		yield setElAttr("aria-hidden","false",helpPopupEl);
+		yield setElAttr("aria-expanded","true",helpBtn);
+
+		// listen for doc events (outside help) to close it
+		let { all: docEvents, } =
+			yield IO.do(initDocEventCapturing,/*subscribe=*/false);
+		return doIOxBackground(function *onDocEvent(viewContext,evt){
+			// click was NOT on the help-popup itself?
+			if (!helpPopupEl.contains(evt.target)) {
+				yield IO.do(cancelEvent,evt);
+				return IO.do(closeHelp);
+			}
+		},[ docEvents, ]);
+	}
+	else {
+		return IO.do(closeHelp);
+	}
+}
+
+function *onSwitchHelpContentTab({ helpPopupEl, helpContentTabsEl, },evt) {
+	var radioEl = (yield matches("input[type=radio]",evt.target)) ? evt.target : undefined;
+
+	// help content tab switched?
+	if (radioEl) {
+		let helpTabs = yield findElements("input[type=radio]",helpContentTabsEl);
+		let helpContents = yield findElements("section",helpPopupEl);
+
+		// switch aria attributes for tabs
+		for (let tabEl of helpTabs) {
+			yield setElAttr("aria-selected","false",tabEl);
+		}
+		let selectedTabEl = yield IO(() => helpTabs.find(el => el.checked));
+		yield setElAttr("aria-selected","true",selectedTabEl);
+
+		// toggle on the selected tab's content
+		for (let tabContentEl of helpContents) {
+			yield addClass("hidden",tabContentEl);
+		}
+		let selectedTabControlsID = yield getElAttr("aria-controls",selectedTabEl);
+		let selectedTabContentEl = yield getElement(selectedTabControlsID);
+		yield removeClass("hidden",selectedTabContentEl);
+	}
+}
+
+function *closeHelp({ helpBtn, helpPopupEl, }) {
+	if (!(yield matches(".hidden",helpPopupEl))) {
+		yield addClass("hidden",helpPopupEl);
+		yield setElAttr("aria-hidden","true",helpPopupEl);
+		yield setElAttr("aria-expanded","false",helpBtn);
 		return IO.do(clearDocEventCapturing);
 	}
 }
@@ -264,16 +346,14 @@ function *onMainMenuClicks({ mainMenuEl, },evt) {
 }
 
 function *getSelectedDifficulty({ difficultySelectorEls, }) {
-	for (let el of difficultySelectorEls) {
-		if (yield isChecked(el)) {
-			let difficulty = yield getElProp("value",el);
-			return difficulty;
-		}
-	}
+	var selectedDifficultyEl = yield IO(() => (
+		difficultySelectorEls.find(el => el.checked)
+	));
+	return getElProp("value",selectedDifficultyEl);
 }
 
 function *onNewGame({ playAreaEl, undoAllBtn, undoBtn, state, }) {
-	yield IO.do(closeMainMenu);
+	yield IO.do(closeMenu);
 
 	var difficulty = yield IO.do(getSelectedDifficulty);
 	yield IO.do(selectDifficulty,difficulty);
@@ -416,18 +496,18 @@ function *onNextPlayWordClicks(viewContext,evt) {
 	var evtTarget = evt.target;
 	return match(
 		matches("label",evtTarget), $=>[
-			IO.do(onNextPlayLetterToggleOff,evt),
-			closeMainMenu,
+			IO.do(onToggleOffNextPlayLetter,evt),
+			closeMenu,
 			scrollDownPlayArea,
 		],
 		$=>matches(".insert-here-btn",evtTarget), $=>[
 			IO.do(onPickInsertPosition,evt),
-			closeMainMenu,
+			closeMenu,
 			scrollDownPlayArea,
 		],
 		$=>matches(".remove-letter-btn",evtTarget), $=>[
 			IO.do(onRemoveLetter,evt),
-			closeMainMenu,
+			closeMenu,
 			scrollDownPlayArea,
 		]
 	);
@@ -446,12 +526,13 @@ function *updatePlayMode(
 	state.playMode = playMode;
 
 	// make sure the main menu is closed
-	yield IO.do(closeMainMenu);
+	yield IO.do(closeMenu);
 
-	// hide message banner
+	// make sure message-banner is closed
 	yield IO.do(hideMessageBanner);
 
-	console.log(state.maxDictWordLength);
+	// make sure help-popup is closed
+	yield IO.do(closeHelp);
 
 	return match(
 		// initial (or reset) state?
@@ -530,7 +611,7 @@ function *updatePlayMode(
 	);
 }
 
-function *onNextPlayLetterToggleOn(viewContext,evt) {
+function *onToggleOnNextPlayLetter(viewContext,evt) {
 	var radioEl = (yield matches("input[type=radio]",evt.target)) ? evt.target : undefined;
 
 	// toggling on a letter?
@@ -540,7 +621,7 @@ function *onNextPlayLetterToggleOn(viewContext,evt) {
 	}
 }
 
-function *onNextPlayLetterToggleOff({ state, },evt) {
+function *onToggleOffNextPlayLetter({ state, },evt) {
 	var radioEl = yield getElement(evt.target.getAttribute("for"));
 
 	// toggling off an already-active letter?
@@ -844,9 +925,12 @@ function *initDocEventCapturing(viewContext,subscribe = true) {
 			click: IOx.onEvent(viewContext.doc,"click",{
 				evtOpts: { capture: true, },
 			}),
-			keydown: IOx.onEvent(viewContext.doc,"keydown",{
-				evtOps: { capture: true, },
-			}),
+			keydown: (
+				IOx.onEvent(viewContext.doc,"keydown",{
+					evtOps: { capture: true, },
+				})
+				.chain(filterIn(evt => evt.key == "Escape"))
+			),
 			all: null,
 		};
 		evts.all = merge([ evts.click, evts.keydown, ]);
