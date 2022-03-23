@@ -4,9 +4,8 @@
 	--max-play-width: calc(var(--vw-unit) * 90);
 	--max-play-height: calc(var(--vh-unit) * 75);
 	--play-width: min(var(--max-play-width),var(--max-play-height) * 0.75);
-	--play-height: min(var(--max-play-height),var(--play-width) * 1.33);
 	--horz-unit: calc(var(--play-width) / 100);
-	--vert-unit: calc(var(--play-height) / 100);
+	--header-text-size: calc(var(--play-width) / 12);
 
 	--color-transparent: rgba(0,0,0,0);
 	--color-black: #000;
@@ -70,7 +69,6 @@ input[type=radio]:disabled + label {
 }
 
 header {
-	--header-text-size: calc(var(--play-width) / 12);
 	--header-text-spacing: calc(var(--header-text-size) / 3);
 	--menu-button-size: calc(var(--header-text-size) * 1.3);
 	--help-button-size: calc(var(--header-text-size) * 1.3);
@@ -251,14 +249,15 @@ menu#main-menu > li button#new-game-btn {
 	position: relative;
 	font-weight: bold;
 	font-size: var(--menu-text-size);
+	text-transform: uppercase;
 	background-color: var(--color-white);
 	outline: none;
 	color: var(--color-black);
 	border: thin solid var(--color-darker-gray);
 	border-radius: calc(var(--horz-unit) * 2);
 	padding:
-		calc(var(--vert-unit) * 1.1) calc(var(--horz-unit) * 3.5)
-		calc(var(--vert-unit) * 1.1) calc(var(--icon-size) * 2);
+		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 1.1)
+		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 2);
 	cursor: pointer;
 }
 menu#main-menu > li button#new-game-btn:after {
@@ -308,7 +307,7 @@ menu#main-menu > li input[type=radio] {
 	--letter-insert-btn-size: calc(var(--letter-spacing) * 2.9);
 	--letter-remove-btn-size: calc(var(--letter-spacing) * 2.8);
 
-	--bottom-spacing: calc(var(--vert-unit) * 8);
+	--bottom-spacing: calc(var(--horz-unit) * 12);
 
 	grid-area: play-area;
 	align-self: end;
@@ -722,7 +721,7 @@ header > #menu-toggle-btn:focus {
 	min-width: calc(var(--play-width) * 0.7);
 	max-width: var(--play-width);
 	left: 50%;
-	top: calc(var(--vert-unit) * 8);
+	top: calc(var(--header-text-size) * 2.1);
 	transform: translateX(-50%);
 	padding: calc(var(--horz-unit) * 4);
 	border: thin solid var(--color-white);
@@ -734,15 +733,17 @@ header > #menu-toggle-btn:focus {
 }
 
 #help-popup {
+	--max-help-width: calc(var(--play-width) * 0.98);
+	--max-help-height: calc(var(--vh-unit) * 80);
 	--help-text-size: min(
-		var(--vw-unit) * 4.3, var(--vh-unit) * 4.3,
-		var(--horz-unit) * 4.5, var(--vert-unit) * 4.5
+		var(--max-help-width) / 17.5,
+		var(--max-help-height) / 34
 	);
 
 	position: fixed;
-	width: calc(var(--play-width) * 0.98);
+	width: var(--max-help-width);
 	left: 50%;
-	top: calc(var(--vh-unit) * 10);
+	top: calc(var(--header-text-size) * 2.1);
 	transform: translateX(-50%);
 	background-color: var(--color-light-gray);
 	border: var(--horz-unit) solid var(--color-darkest-gray);
@@ -788,7 +789,7 @@ header > #menu-toggle-btn:focus {
 	opacity: 0.8;
 }
 #help-popup p:nth-of-type(1) {
-	margin-top: calc(var(--help-text-size) * 0.5);
+	margin-top: calc(var(--help-text-size) * 1.1);
 }
 #help-popup i {
 	--icon-size: calc(var(--help-text-size) * 1.5);
@@ -858,19 +859,22 @@ header > #menu-toggle-btn:focus {
 	left: -2000px;
 }
 #help-popup > #help-content-tabs > li > input[type=radio] + label {
-	font-size: calc(var(--help-text-size) * 0.9);
+	--tab-text-size: calc(var(--max-help-width) / 23);
+
+	font-size: var(--tab-text-size);
 	font-weight: bold;
 	text-transform: uppercase;
-	background-color: transparent;
+	background-color: var(--color-white);
 	color: var(--color-darkest-gray);
 	border: thin solid var(--color-darkest-gray);
-	padding: calc(var(--help-text-size) * 0.25) calc(var(--help-text-size) * 0.75);
-	border-radius: calc(var(--horz-unit) * 2);
+	padding: calc(var(--tab-text-size) * 0.25) calc(var(--tab-text-size) * 0.75);
+	border-radius: calc(var(--tab-text-size) / 3);
 	cursor: pointer;
+	white-space: nowrap;
 }
 #help-popup > #help-content-tabs > li > input[type=radio]:checked + label {
 	background-color: var(--color-darkest-gray);
-	color: var(--color-light-gray);
+	color: var(--color-white);
 	cursor: default;
 }
 #help-popup > section {
@@ -885,7 +889,7 @@ header > #menu-toggle-btn:focus {
 	padding-bottom: calc(var(--help-text-size) * 1.5);
 }
 #help-example-1, #help-example-2 {
-	--img-width: calc(var(--help-text-size) * 9);
+	--img-width: calc(var(--max-help-width) * 0.43);
 	--img-height: calc(var(--img-width) * 0.86);
 
 	font-size: 0.001px;
