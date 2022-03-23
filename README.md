@@ -37,15 +37,27 @@ You're allowed one undo per game. But if you flip on **EASY** mode, you get unli
 ## Example Games
 
 ```
-B O U N D
+T O O N
 
-B O N D
+T O N
 
-B A N D
+T I N
 
-A N D
+I N
 
-A D
+I
+```
+
+```
+S O U R
+
+O U R
+
+O A R
+
+M A R
+
+M A
 
 A
 ```
