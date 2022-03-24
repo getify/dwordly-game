@@ -86,6 +86,7 @@ function *main({ window: win, document: doc, } = {}) {
 		keyboardEl: yield getElement("keyboard"),
 
 		state: {
+			score: 0,
 			playMode: 0,
 			maxWordLength: 0,
 			playedWords: [],
@@ -337,6 +338,9 @@ function *onMainMenuClicks({ mainMenuEl, },evt) {
 			// clicked on close button?
 			$=>matches("#close-menu-btn",target), $=>[
 				onToggleMainMenu,
+			],
+			$=>matches("#menu-help-btn",target), $=>[
+				onToggleHelp,
 			],
 			$=>matches("#new-game-btn",target), $=>[
 				onNewGame,
@@ -698,6 +702,17 @@ function *onPlayWord({
 		if (wordAllowed) {
 			state.maxWordLength = Math.max(state.maxWordLength,state.pendingNextWord.length);
 			state.playedWords.push(state.pendingNextWord);
+
+			// down to a two-letter word that we can just auto-play
+			// a final one-letter word from?
+			if (
+				state.pendingNextWord.length == 2 &&
+				/[AI]/.test(state.pendingNextWord)
+			) {
+				state.pendingNextWord = state.pendingNextWord.replace(/[^AI]/g,"");
+				state.playedWords.push(state.pendingNextWord);
+			}
+
 			yield IO.do(renderPlayedWords);
 
 			// make sure undo/undo-all buttons are available
@@ -726,7 +741,10 @@ function *onPlayWord({
 				yield setInnerHTML("",nextPlayWordEl);
 				yield IO.do(scrollDownPlayArea);
 				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
-				return IO.do(showMessageBanner,"GAME OVER!");
+				let gameOverMsg = `Score: ${state.score}%<br>${
+					(state.score == 100) ? "Awesome!" : "Undo moves and try again?"
+				}`;
+				return IO.do(showMessageBanner,gameOverMsg);
 			}
 		}
 		else {
@@ -878,7 +896,7 @@ function *scrollDownPlayArea({ playAreaEl, }) {
 }
 
 function *showMessageBanner({ doc, messageBanner, },message) {
-	yield setInnerText(message,messageBanner);
+	yield setInnerHTML(message,messageBanner);
 	yield setElAttr("aria-live","polite",messageBanner);
 	if (yield matches(".hidden",messageBanner)) {
 		yield removeClass("hidden",messageBanner);
@@ -898,17 +916,17 @@ function *hideMessageBanner({ messageBanner, }) {
 	}
 }
 
-function *updateGameScore({ scoreEl, state: { playedWords, }, }) {
-	if (playedWords.length > 1) {
+function *updateGameScore({ scoreEl, state, }) {
+	if (state.playedWords.length > 1) {
 		yield setElAttr("aria-live","polite",scoreEl);
-		let score = yield IO.do(scoreGame,playedWords);
-		if (score > 85) {
+		state.score = yield IO.do(scoreGame,state.playedWords);
+		if (state.score > 85) {
 			yield addClass("good",scoreEl);
 		}
 		else {
 			yield removeClass("good",scoreEl);
 		}
-		return setInnerText(`${score}%`,scoreEl);
+		return setInnerText(`${state.score}%`,scoreEl);
 	}
 	else {
 		yield setElAttr("aria-live","off",scoreEl);

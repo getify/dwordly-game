@@ -32,14 +32,15 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
 	<li role="none"><button type="button" id="new-game-btn" role="menuitem" aria-label="start a new game">new game</button></li>
 	<li role="none">
-		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" role="menuitem" aria-label="select easy game mode"><label for="easy-difficulty"> easy</label>
+		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" role="menuitem" aria-label="Select easy game mode" checked><label for="easy-difficulty"> easy</label>
 	</li>
 	<li role="none">
-		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" role="menuitem" aria-label="select medium game mode" checked><label for="medium-difficulty"> medium</label>
+		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" role="menuitem" aria-label="Select medium game mode"><label for="medium-difficulty"> medium</label>
 	</li>
 	<li role="none">
-		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" role="menuitem" aria-label="select hard game mode"><label for="hard-difficulty"> hard</label>
+		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" role="menuitem" aria-label="Select hard game mode"><label for="hard-difficulty"> hard</label>
 	</li>
+	<li role="none"><button type="button" id="menu-help-btn" role="menuitem" aria-controls="help-popup" aria-expanded="false" aria-label="Open the help and game instructions">help</button></li>
 </menu>
 <div id="play-area" class="hidden" aria-label="Play the game here">
 	<div id="played-words">
@@ -73,7 +74,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 
 	<p>Dwindle the starting word down to a one-letter word, in the fewest moves.<p>
 	<p>No lucky guessing here&mdash;unlike other word games!&mdash;just clever word play.</p>
-	<p>Keep playing games from 3 difficulty levels.</p>
+	<p>Keep playing words from 3 difficulty levels.</p>
 
 	<hr>
 
@@ -85,30 +86,34 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<li><input type="radio" name="help-content-selector" id="help-about-tab" aria-controls="help-about-content" aria-selected="false" role="tab"> <label for="help-about-tab" id="help-about-tab-text" aria-label="See information about this game and its creator">about</label></li>
 	</ul>
 	<section id="help-example-content" aria-labelledby="help-example-tab-text" role="tabpanel">
-		<div id="help-example-1" aria-label="Game example: TON > TIN > IN > I">
-			TON
-			TIN
-			IN
-			I
+		<p>For each move: <strong>change</strong> a letter, <strong>remove</strong> a letter, or <strong>add</strong> a letter. Each move must make a valid word&mdash;no repeats.</p>
+		<div id="help-example-games">
+			<div id="help-example-1" aria-label="Game example: TON > TIN > IN > I">
+				TON
+				TIN
+				IN
+				I
+			</div>
+			<div id="help-example-2" aria-label="Game example: SOUR > OUR > OAR > MAR > ...">
+				SOUR
+				OUR
+				OAR
+				MAR
+			</div>
 		</div>
-		<div id="help-example-2" aria-label="Game example: SOUR > OUR > OAR > MAR > ...">
-			SOUR
-			OUR
-			OAR
-			MAR
-		</div>
+		<p>Play ends at a one-letter word (A or I).</p>
 	</section>
 	<section id="help-instructions-content" class="hidden" aria-labelledby="help-instructions-tab-text" role="tabpanel">
-		<p>Tap a letter <i id="help-letter" aria-label="Letter in the next-play area that can be activated"></i> to activate <i id="help-activated-letter" aria-label="Activated letter"></i>. Then tap any <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> to change the letter or <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
+		<p>Tap any letter <i id="help-letter" aria-label="Letter in the next-play area that can be activated"></i> to activate <i id="help-activated-letter" aria-label="Activated letter"></i> it. Then tap any <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> to change the letter or tap <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
 		<p>Tap <i id="help-insert-letter" aria-label="Start letter-insert mode"></i> and <i id="help-insert-letter-position" aria-label="Choose where a new letter should be inserted: start of word, end of word, or between two letters"></i> to insert a new letter.</p>
 		<p>Tap <i id="help-play-word" aria-label="Attempt to play the current word"></i> to complete a move if it's a valid word or <i id="help-reset-move" aria-label="Reset current word"></i> to reset a move.</p>
-		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different words to improve your score <strong>%</strong> percent.</p>
+		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different words and improve your score <strong>%</strong> percent.</p>
 	</section>
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
 		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
+		<p>Version: <strong>0.5.1</strong> | <strong><a href="https://forms.gle/JaqALq1H27NavxnE9" target="_blank">FEEDBACK SURVEY</a></strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
-		<p>Version: <strong>0.5.0</strong></p>
 	</section>
 </div>
 

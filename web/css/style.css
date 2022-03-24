@@ -243,6 +243,43 @@ menu#main-menu > li:nth-of-type(2) {
 	margin-top: calc(var(--menu-text-size) * 0.75);
 }
 
+menu#main-menu > li button#menu-help-btn {
+	--icon-size: calc(var(--menu-text-size) * 0.9);
+
+	position: relative;
+	font-weight: bold;
+	font-size: var(--menu-text-size);
+	text-transform: uppercase;
+	background-color: var(--color-white);
+	outline: none;
+	color: var(--color-black);
+	border: thin solid var(--color-darker-gray);
+	border-radius: calc(var(--horz-unit) * 2);
+	margin-top: var(--menu-text-size);
+	padding:
+		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 1.1)
+		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 2);
+	cursor: pointer;
+}
+menu#main-menu > li button#menu-help-btn:after {
+	content: "";
+	display: block;
+	position: absolute;
+	width: var(--icon-size);
+	height: var(--icon-size);
+	left: calc(var(--icon-size) / 2);
+	top: 50%;
+	transform: translateY(-50%);
+	background-image: url(../images/icon-help.svg);
+	background-position: 0;
+	background-size: var(--icon-size);
+	background-repeat: no-repeat;
+}
+menu#main-menu > li button#menu-help-btn:focus {
+	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
+	opacity: 0.8;
+}
+
 menu#main-menu > li button#new-game-btn {
 	--icon-size: calc(var(--menu-text-size) * 0.9);
 
@@ -727,6 +764,7 @@ header > #menu-toggle-btn:focus {
 	border: thin solid var(--color-white);
 	border-radius: calc(var(--horz-unit) * 1.5);
 	text-align: center;
+	z-index: 1000;
 }
 #message-banner.hidden {
 	display: none;
@@ -750,6 +788,10 @@ header > #menu-toggle-btn:focus {
 	border-radius: calc(var(--horz-unit) * 3);
 	padding: calc(var(--horz-unit) * 4);
 	font-size: var(--help-text-size);
+	z-index: 1000;
+}
+#help-popup a, #help-popup a:visited {
+	color: var(--color-orange);
 }
 #help-popup.hidden {
 	display: none;
@@ -883,10 +925,9 @@ header > #menu-toggle-btn:focus {
 #help-popup > section.hidden {
 	display: none;
 }
-#help-example-content {
+#help-example-games {
 	display: flex;
 	justify-content: center;
-	padding-bottom: calc(var(--help-text-size) * 1.5);
 }
 #help-example-1, #help-example-2 {
 	--img-width: calc(var(--max-help-width) * 0.43);
