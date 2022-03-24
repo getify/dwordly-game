@@ -65,6 +65,7 @@ function *main({ window: win, document: doc, } = {}) {
 		docEventsCaptured: null,
 
 		// get DOM element references
+		loadingEl: yield getElement("loading"),
 		helpBtn: yield getElement("help-btn"),
 		scoreEl: yield getElement("game-score"),
 		messageBanner: yield getElement("message-banner"),
@@ -356,7 +357,14 @@ function *getSelectedDifficulty({ difficultySelectorEls, }) {
 	return getElProp("value",selectedDifficultyEl);
 }
 
-function *onNewGame({ playAreaEl, undoAllBtn, undoBtn, state, }) {
+function *onNewGame({
+	loadingEl,
+	playAreaEl,
+	undoAllBtn,
+	undoBtn,
+	state,
+}) {
+	yield removeClass("hidden",loadingEl);
 	yield IO.do(closeMenu);
 
 	var difficulty = yield IO.do(getSelectedDifficulty);
@@ -378,6 +386,7 @@ function *onNewGame({ playAreaEl, undoAllBtn, undoBtn, state, }) {
 	// cheating at the game (temporarily)
 	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
 
+	yield addClass("hidden",loadingEl);
 	yield removeClass("hidden",playAreaEl);
 	yield disableEl(undoAllBtn);
 	yield disableEl(undoBtn);

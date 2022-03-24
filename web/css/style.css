@@ -425,43 +425,6 @@ menu#main-menu > li input[type=radio] {
 	display: none;
 }
 
-
-
-header > #menu-toggle-btn {
-	position: absolute;
-	left: var(--header-text-spacing);
-	top: 50%;
-	transform: translateY(-50%);
-	padding: 0;
-	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
-	border-radius: 15%;
-	outline: none;
-	color: transparent;
-	background: transparent;
-	border: none;
-	cursor: pointer;
-}
-header > #menu-toggle-btn::after {
-	content: "";
-	display: block;
-	width: var(--menu-button-size);
-	height: var(--menu-button-size);
-	border-radius: 15%;
-	background-image: url(../images/icon-menu.svg);
-	background-position: 0;
-	background-size: var(--menu-button-size);
-	background-repeat: no-repeat;
-}
-header > #menu-toggle-btn:focus {
-	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
-}
-
-
-
-
 #played-words-list {
 	list-style-type: none;
 	margin: 0;
@@ -745,6 +708,34 @@ header > #menu-toggle-btn:focus {
 #keyboard > form {
 	margin: 0;
 	padding: 0;
+}
+
+#loading {
+	display: block;
+	position: fixed;
+	color: transparent;
+	font-size: 0.001px;
+	line-height: 0.001px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	z-index: 1000;
+}
+#loading::after {
+	--img-width: calc(var(--horz-unit) * 40);
+	--img-height: calc(var(--img-width) * 0.231);
+
+	content: "";
+	display: block;
+	width: var(--img-width);
+	height: var(--img-height);
+	background-image: url(../images/animated-loader.svg);
+	background-position: 0;
+	background-size: var(--img-width) var(--img-height);
+	background-repeat: no-repeat;
+}
+#loading.hidden {
+	display: none;
 }
 
 #message-banner {
