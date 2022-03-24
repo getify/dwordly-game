@@ -41,6 +41,8 @@ import {
 	removeClass,
 	setCSSVar,
 	cancelEvent,
+	getLSValue,
+	setLSValue,
 	reportError,
 } from "./util.mjs";
 
@@ -231,6 +233,12 @@ function *runApp({
 
 	// init the play state
 	yield IO.do(updatePlayMode,/*nextPlayMode=*/state.playMode);
+
+	var hasHelpShown = ((yield getLSValue("help-shown")) == "true");
+	if (!hasHelpShown) {
+		yield setLSValue("help-shown","true");
+		yield IO.do(onToggleHelp);
+	}
 }
 
 function *onToggleMainMenu({ doc, menuToggleBtn, mainMenuEl, }) {

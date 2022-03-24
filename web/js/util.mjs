@@ -65,6 +65,8 @@ export {
 	setCSSVar,
 	cancelEvent,
 	requestJSON,
+	getLSValue,
+	setLSValue,
 	reportError,
 };
 
@@ -155,6 +157,18 @@ function *cancelEvent(env,evt) {
 
 function requestJSON(url) {
 	return IO(() => fetch(url).then(res => res.json()));
+}
+
+function getLSValue(lsName) {
+	return IO(({ win, }) =>
+		(win && win.localStorage) ? win.localStorage.getItem(lsName) : undefined
+	);
+}
+
+function setLSValue(lsName,val) {
+	return IO(({ win, }) =>
+		(win && win.localStorage) ? win.localStorage.setItem(lsName,val) : undefined
+	);
 }
 
 function reportError(err) {
