@@ -68,6 +68,7 @@ function *main({ window: win, document: doc, } = {}) {
 
 		// get DOM element references
 		loadingEl: yield getElement("loading"),
+		handHintEl: null,
 		helpBtn: yield getElement("help-btn"),
 		scoreEl: yield getElement("game-score"),
 		messageBanner: yield getElement("message-banner"),
@@ -94,8 +95,18 @@ function *main({ window: win, document: doc, } = {}) {
 			maxWordLength: 0,
 			playedWords: [],
 			pendingNextWord: null,
+			hints: {
+				letterHandHintShown: false,
+				keyboardHandHintShown: false,
+			},
 		},
 	};
+
+	// pull hints state from local-storage (if any)
+	viewContext.state.hints.letterHandHintShown =
+		((yield applyIO(getLSValue("letter-hand-hint-shown"),viewContext)) === "true");
+	viewContext.state.hints.keyboardHandHintShown =
+		((yield applyIO(getLSValue("keyboard-hand-hint-shown"),viewContext)) === "true");
 
 	// get more DOM element references
 	viewContext.difficultySelectorEls =
@@ -234,7 +245,21 @@ function *runApp({
 	// init the play state
 	yield IO.do(updatePlayMode,/*nextPlayMode=*/state.playMode);
 
-	var hasHelpShown = ((yield getLSValue("help-shown")) == "true");
+	// show the hand-hint on the first next-play letter?
+	if (!state.hints.letterHandHintShown) {
+		state.hints.letterHandHintShown = true;
+		yield setLSValue("letter-hand-hint-shown","true");
+
+		let firstLetterEl = (yield findElements(".letter",nextPlayFormEl))[0];
+		yield IO.do(showHandHint,firstLetterEl,{
+			left: "50%",
+			top: "85%",
+			transform: "translateX(-50%)",
+		});
+	}
+
+	// auto-popup the help?
+	var hasHelpShown = ((yield getLSValue("help-shown")) === "true");
 	if (!hasHelpShown) {
 		yield setLSValue("help-shown","true");
 		yield IO.do(onToggleHelp);
@@ -372,6 +397,7 @@ function *onNewGame({
 	undoBtn,
 	state,
 }) {
+	yield addClass("hidden",playAreaEl);
 	yield removeClass("hidden",loadingEl);
 	yield IO.do(closeMenu);
 
@@ -633,6 +659,9 @@ function *updatePlayMode(
 }
 
 function *onToggleOnNextPlayLetter(viewContext,evt) {
+	// make sure to hide the hand hint
+	yield IO.do(hideHandHint);
+
 	var radioEl = (yield matches("input[type=radio]",evt.target)) ? evt.target : undefined;
 
 	// toggling on a letter?
@@ -643,6 +672,9 @@ function *onToggleOnNextPlayLetter(viewContext,evt) {
 }
 
 function *onToggleOffNextPlayLetter({ state, },evt) {
+	// make sure to hide the hand hint
+	yield IO.do(hideHandHint);
+
 	var radioEl = yield getElement(evt.target.getAttribute("for"));
 
 	// toggling off an already-active letter?
@@ -654,6 +686,9 @@ function *onToggleOffNextPlayLetter({ state, },evt) {
 }
 
 function *onStartInsertLetter(viewContext) {
+	// make sure to hide the hand hint
+	yield IO.do(hideHandHint);
+
 	yield IO.do(scrollDownPlayArea);
 	return IO.do(updatePlayMode,/*nextPlayMode=*/3);
 }
@@ -904,7 +939,23 @@ function *updateRemoveButtons({ nextPlayFormEl, },enable = true) {
 	return IO.do(updateElements,buttons,enable);
 }
 
-function *updateKeyboard({ keyboardBtns, },enable) {
+function *updateKeyboard({ keyboardBtns, state, },enable) {
+	// make sure any previous hand hint has been hidden
+	yield IO.do(hideHandHint);
+
+	// should we show the hand hint on the keyboard?
+	if (enable && !state.hints.keyboardHandHintShown) {
+		state.hints.keyboardHandHintShown = true;
+		yield setLSValue("keyboard-hand-hint-shown","true");
+
+		let aKeyEl = keyboardBtns[10];
+		yield IO.do(showHandHint,aKeyEl,{
+			left: "50%",
+			top: "85%",
+			transform: "translateX(-50%)",
+		});
+	}
+
 	return IO.do(updateElements,keyboardBtns,enable);
 }
 
@@ -949,6 +1000,24 @@ function *updateGameScore({ scoreEl, state, }) {
 		yield setElAttr("aria-live","off",scoreEl);
 		yield removeClass("good",scoreEl);
 		return setInnerText("",scoreEl);
+	}
+}
+
+function *showHandHint(viewContext,targetEl,position = {}) {
+	// (re)create element (to reset any style positioning)
+	viewContext.handHintEl = yield createElement("div");
+	yield setElProp("id","hand-hint",viewContext.handHintEl);
+	yield appendChild(targetEl,viewContext.handHintEl);
+
+	// set inline style positioning props (if any)
+	for (let [ styleProp, val ] of Object.entries(position)) {
+		yield IO(() => viewContext.handHintEl.style[styleProp] = val);
+	}
+}
+
+function *hideHandHint(viewContext) {
+	if (viewContext.handHintEl) {
+		yield removeElement(viewContext.handHintEl);
 	}
 }
 

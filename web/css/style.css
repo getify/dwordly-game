@@ -683,6 +683,7 @@ menu#main-menu > li input[type=radio] {
 	flex-wrap: wrap;
 }
 #keyboard > form > button {
+	position: relative;
 	flex-basis: auto;
 	width: var(--key-width);
 	height: var(--key-height);
@@ -736,6 +737,28 @@ menu#main-menu > li input[type=radio] {
 }
 #loading.hidden {
 	display: none;
+}
+
+#hand-hint {
+	display: block;
+	position: absolute;
+	color: transparent;
+	font-size: 0.001px;
+	line-height: 0.001px;
+	transform: translate(-50%,-50%);
+	z-index: 1000;
+}
+#hand-hint::after {
+	--img-size: calc(var(--horz-unit) * 10);
+
+	content: "";
+	display: block;
+	width: var(--img-size);
+	height: var(--img-size);
+	background-image: url(../images/animated-hand.svg);
+	background-position: 0;
+	background-size: var(--img-size);
+	background-repeat: no-repeat;
 }
 
 #message-banner {
