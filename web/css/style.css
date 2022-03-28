@@ -943,10 +943,15 @@ menu#main-menu > li input[type=radio] {
 	display: flex;
 	justify-content: center;
 }
-#help-example-1, #help-example-2 {
-	--img-width: calc(var(--max-help-width) * 0.43);
+#help-example-1 {
+	--img-width: calc(var(--max-help-width) * 0.528);
 	--img-height: calc(var(--img-width) * 0.86);
-
+}
+#help-example-2 {
+	--img-width: calc(var(--max-help-width) * 0.332);
+	--img-height: calc(var(--img-width) * 1.364);
+}
+#help-example-1, #help-example-2 {
 	font-size: 0.001px;
 	line-height: 0.001px;
 	color: transparent;

@@ -49,30 +49,34 @@ function *selectDifficulty({ state, },difficulty) {
 	));
 }
 
-function *getGame({ state: { neighbors, games, }, }) {
+function *getGame({ state, }) {
+	var { neighbors, games, } = state;
 	var gameIdx = Math.round(Math.random() * 1E9) % games.length;
 	var game = games[gameIdx];
-
-	// cheating at the game (temporarily)
-	console.log( yield IO.do(findShortestPath,game[0]) );
-
+	state.optimalPath = yield IO.do(findShortestPath,game[0]);
 	return game;
 }
 
-function *movesPossible({ state: { neighbors, }, },words) {
-	var recentWord = words[words.length - 1];
+function *movesPossible({ state: { optimalPath, neighbors, }, },playedWords) {
+	var mostRecentWord = playedWords[playedWords.length - 1];
 
 	// already at a single-letter word?
-	if (recentWord.length == 1) {
+	if (
+		// already at a single-letter word?
+		mostRecentWord.length == 1 ||
+
+		// too many words played already?
+		playedWords.length > (optimalPath.length + 4)
+	) {
 		return false;
 	}
 
 	// check all neighbor words to see if any can be
 	// played?
-	for (let { text: nextWord } of neighbors[recentWord]) {
+	for (let { text: nextWord } of neighbors[mostRecentWord]) {
 		// found an available (not already used) word
 		// to play?
-		if (!words.includes(nextWord)) {
+		if (!playedWords.includes(nextWord)) {
 			return true;
 		}
 	}
@@ -84,24 +88,23 @@ function *checkNextWord({ state: { neighbors, }, },words,nextWord) {
 	return (!words.includes(nextWord) && nextWords.includes(nextWord));
 }
 
-function *scoreGame(viewContext,game) {
+function *scoreGame({ state: { optimalPath, }, },game) {
 	var score = 0;
-	var optimalGame = yield IO.do(findShortestPath,game[0]);
 
-	// 25% of the score: character count
+	// 25% of the score: overall character count
 	var gameTotalCharCount = game.join("").length;
-	var optimalTotalCharCount = optimalGame.join("").length;
+	var optimalTotalCharCount = optimalpath.join("").length;
 	score += Math.min(25,(25 * (optimalTotalCharCount / gameTotalCharCount)));
 
 	// 25% of the score: length of the dwordly path
 	score += (25 * (
-		Math.min(game.length,optimalGame.length) /
-		Math.max(game.length,optimalGame.length)
+		Math.min(game.length,optimalpath.length) /
+		Math.max(game.length,optimalpath.length)
 	));
 
 	// 50% of the score: length of final word
 	var gameFinalWordLength = game[game.length - 1].length;
-	var optimalFinalWordLength = optimalGame[optimalGame.length - 1].length;
+	var optimalFinalWordLength = optimalpath[optimalpath.length - 1].length;
 	score += Math.min(50,(50 * optimalFinalWordLength / gameFinalWordLength));
 
 	return Math.floor(score);

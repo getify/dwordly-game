@@ -417,9 +417,6 @@ function *onNewGame({
 	// render the initial next-play word
 	yield IO.do(renderNextPlayWord);
 
-	// cheating at the game (temporarily)
-	console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
-
 	yield addClass("hidden",loadingEl);
 	yield removeClass("hidden",playAreaEl);
 	yield disableEl(undoAllBtn);
@@ -599,7 +596,7 @@ function *updatePlayMode(
 		playMode == 1, $=>[
 			disableEl(insertLetterBtn),
 			disableEl(playWordBtn),
-			enableEl(resetWordBtn),
+			disableEl(resetWordBtn),
 			IO.do(updateNextPlayLetters,/*enable=*/true),
 			IO.do(updateInsertButtons,/*enable=*/false),
 			IO.do(updateRemoveButtons,/*enable=*/true),
@@ -780,10 +777,7 @@ function *onPlayWord({
 			if (moreMovedAllowed) {
 				yield IO.do(renderNextPlayWord);
 				yield IO.do(scrollDownPlayArea);
-				yield IO.do(updatePlayMode,/*nextPlayMode=*/0);
-
-				// cheating at the game (temporarily)
-				console.log([ ...state.neighbors[state.pendingNextWord] ].map(obj => obj.text));
+				return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 			}
 			else {
 				yield addClass("complete",playedWordsEl);
