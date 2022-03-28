@@ -1007,13 +1007,20 @@ function *updateGameScore({ scoreEl, state, }) {
 	if (state.playedWords.length > 1) {
 		yield setElAttr("aria-live","polite",scoreEl);
 		state.score = yield IO.do(scoreGame,state.playedWords);
-		if (state.score > 85) {
+		if (state.score >= 80) {
 			yield addClass("good",scoreEl);
+			yield removeClass("ok",scoreEl);
 		}
-		else {
+		else if (state.score >= 50) {
+			yield addClass("ok",scoreEl);
 			yield removeClass("good",scoreEl);
 		}
-		return setInnerText(`${state.score}%`,scoreEl);
+		else {
+			yield removeClass("ok",scoreEl);
+			yield removeClass("good",scoreEl);
+		}
+		let score = state.score.toFixed(1).replace(/\.0$/,"");
+		return setInnerText(`${score}%`,scoreEl);
 	}
 	else {
 		yield setElAttr("aria-live","off",scoreEl);

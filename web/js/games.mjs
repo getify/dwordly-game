@@ -47,12 +47,25 @@ function *loadDifficulty({ state, },difficulty) {
 		difficulty == "medium", $=>iReturn(requestJSON("/medium.json")),
 		difficulty == "hard", $=>iReturn(requestJSON("/hard.json"))
 	));
+
+	// compute min/max difficulties for this level
+	state.minDifficultyRating = Infinity;
+	state.maxDifficultyRating = 0;
+	for (let game of state.games) {
+		if (game[1] < state.minDifficultyRating) {
+			state.minDifficultyRating = game[1];
+		}
+		if (game[1] > state.maxDifficultyRating) {
+			state.maxDifficultyRating = game[1];
+		}
+	}
 }
 
 function *getGame({ state, }) {
 	var { neighbors, games, } = state;
 	var gameIdx = Math.round(Math.random() * 1E9) % games.length;
 	var game = games[gameIdx];
+	state.difficultyRating = game[1];
 	state.optimalPath = yield IO.do(findShortestPath,game[0]);
 	return game;
 }
@@ -88,26 +101,43 @@ function *checkNextWord({ state: { neighbors, }, },words,nextWord) {
 	return (!words.includes(nextWord) && nextWords.includes(nextWord));
 }
 
-function *scoreGame({ state: { optimalPath, }, },game) {
+function *scoreGame(
+	{
+		state: {
+			optimalPath,
+			difficultyRating,
+			minDifficultyRating,
+			maxDifficultyRating,
+		},
+	},
+	game
+) {
 	var score = 0;
+	var difficultyFactor = (difficultyRating - minDifficultyRating) / (maxDifficultyRating - minDifficultyRating);
 
-	// 25% of the score: overall character count
+	// 65% of the score: overall character count
 	var gameTotalCharCount = game.join("").length;
-	var optimalTotalCharCount = optimalpath.join("").length;
-	score += Math.min(25,(25 * (optimalTotalCharCount / gameTotalCharCount)));
+	var optimalTotalCharCount = optimalPath.join("").length;
+	score += Math.min(65,(65 * (optimalTotalCharCount / gameTotalCharCount)));
 
-	// 25% of the score: length of the dwordly path
-	score += (25 * (
-		Math.min(game.length,optimalpath.length) /
-		Math.max(game.length,optimalpath.length)
+	// 20% of the score: length of the dwordly path
+	score += (20 * (
+		Math.min(game.length,optimalPath.length) /
+		Math.max(game.length,optimalPath.length)
 	));
 
-	// 50% of the score: length of final word
+	// 15% of the score: length of final word
 	var gameFinalWordLength = game[game.length - 1].length;
-	var optimalFinalWordLength = optimalpath[optimalpath.length - 1].length;
-	score += Math.min(50,(50 * optimalFinalWordLength / gameFinalWordLength));
+	var optimalFinalWordLength = optimalPath[optimalPath.length - 1].length;
+	score += Math.min(15,(15 * optimalFinalWordLength / gameFinalWordLength));
 
-	return Math.floor(score);
+	// scale the raw score by the difficulty-factor
+	score = score * (1 - ((100 - score) * (1 - difficultyFactor) / 100));
+
+	// truncate to a single decimal place
+	score = Number(score.toFixed(1));
+
+	return score;
 }
 
 function *findShortestPath({ state: { neighbors, }, },word) {

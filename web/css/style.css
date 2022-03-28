@@ -161,14 +161,15 @@ header > #game-score {
 	top: 50%;
 	transform: translateY(-50%);
 	font-weight: bold;
-	font-size: var(--header-text-size);
+	font-size: calc(var(--header-text-size) * 0.8);
+	color: var(--color-darkest-gray);
+}
+header > #game-score.ok {
 	color: var(--color-ok-score);
 }
-
 header > #game-score.good {
 	color: var(--color-good-score);
 }
-
 header > #score.hidden {
 	display: none;
 }
@@ -279,7 +280,9 @@ menu#main-menu > li button#new-game-btn:focus {
 menu#main-menu > li input[type=radio] {
 	width: calc(var(--horz-unit) * 6);
 	height: calc(var(--horz-unit) * 6);
-	margin: calc(var(--horz-unit) * 3) 0;
+	margin:
+		calc(var(--horz-unit) * 3) 0
+		calc(var(--horz-unit) * 3) calc(var(--horz-unit) * 6);
 	vertical-align: middle;
 	cursor: pointer;
 }
