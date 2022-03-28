@@ -18,7 +18,7 @@ import {
 
 export {
 	loadDictionary,
-	selectDifficulty,
+	loadDifficulty,
 	getGame,
 	movesPossible,
 	checkNextWord,
@@ -41,7 +41,7 @@ function *loadDictionary({ state, }) {
 	}
 }
 
-function *selectDifficulty({ state, },difficulty) {
+function *loadDifficulty({ state, },difficulty) {
 	state.games = yield matchReturned(match(
 		difficulty == "easy", $=>iReturn(requestJSON("/easy.json")),
 		difficulty == "medium", $=>iReturn(requestJSON("/medium.json")),

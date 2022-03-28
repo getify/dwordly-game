@@ -48,7 +48,7 @@ import {
 
 import {
 	loadDictionary,
-	selectDifficulty,
+	loadDifficulty,
 	getGame,
 	movesPossible,
 	checkNextWord,
@@ -102,11 +102,15 @@ function *main({ window: win, document: doc, } = {}) {
 		},
 	};
 
-	// pull hints state from local-storage (if any)
+	// pull state from local-storage (if any)
 	viewContext.state.hints.letterHandHintShown =
 		((yield applyIO(getLSValue("letter-hand-hint-shown"),viewContext)) === "true");
 	viewContext.state.hints.keyboardHandHintShown =
 		((yield applyIO(getLSValue("keyboard-hand-hint-shown"),viewContext)) === "true");
+	let difficulty = yield applyIO(getLSValue("difficulty-level"),viewContext);
+	viewContext.state.difficulty = (
+		[ "easy", "medium", "hard", ].includes(difficulty) ? difficulty : "easy"
+	);
 
 	// get more DOM element references
 	viewContext.difficultySelectorEls =
@@ -124,6 +128,7 @@ function *runApp({
 	doc,
 	menuToggleBtn,
 	mainMenuEl,
+	difficultySelectorEls,
 	helpBtn,
 	helpCloseBtn,
 	helpContentTabsEl,
@@ -183,6 +188,11 @@ function *runApp({
 		IOx.onEvent(mainMenuEl,"click"),
 	]);
 
+	// handle difficulty selector changes
+	yield doIOxBackground(onChangeDifficulty,[
+		IOx.onEvent(mainMenuEl,"change"),
+	]);
+
 	// cancel submit events from the `form` elements
 	yield doIOxBackground(cancelEvent,[
 		merge([
@@ -238,6 +248,16 @@ function *runApp({
 			evtOpts: { capture: true, },
 		}),
 	]);
+
+	// **********************************************
+
+	// ensure difficulty selector is initialized
+	var difficultyEl = yield IO(() => (
+		difficultySelectorEls.find(el => el.value == state.difficulty)
+	));
+	if (difficultyEl) {
+		yield setElAttr("checked","",difficultyEl);
+	}
 
 	// start a new game
 	yield IO.do(onNewGame);
@@ -383,11 +403,17 @@ function *onMainMenuClicks({ mainMenuEl, },evt) {
 	}
 }
 
-function *getSelectedDifficulty({ difficultySelectorEls, }) {
-	var selectedDifficultyEl = yield IO(() => (
-		difficultySelectorEls.find(el => el.checked)
-	));
-	return getElProp("value",selectedDifficultyEl);
+function *onChangeDifficulty({ difficultySelectorEls, state, },evt) {
+	if (yield matches("[id$=-difficulty]",evt.target)) {
+		let selectedDifficultyEl = yield IO(() => (
+			difficultySelectorEls.find(el => el.checked)
+		));
+		let difficulty = yield getElProp("value",selectedDifficultyEl);
+		if ([ "easy", "medium", "hard", ].includes(difficulty)) {
+			state.difficulty = difficulty;
+			return setLSValue("difficulty-level",difficulty);
+		}
+	}
 }
 
 function *onNewGame({
@@ -401,8 +427,7 @@ function *onNewGame({
 	yield removeClass("hidden",loadingEl);
 	yield IO.do(closeMenu);
 
-	var difficulty = yield IO.do(getSelectedDifficulty);
-	yield IO.do(selectDifficulty,difficulty);
+	yield IO.do(loadDifficulty,state.difficulty);
 	var game = yield IO.do(getGame);
 
 	state.maxWordLength = game[0].length;
