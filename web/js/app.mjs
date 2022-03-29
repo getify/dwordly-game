@@ -1095,7 +1095,8 @@ function *hideMessageBanner({ messageBanner, }) {
 	if (!(yield matches(".hidden",messageBanner))) {
 		yield addClass("hidden",messageBanner);
 		yield setElAttr("aria-live","off",messageBanner);
-		return setInnerHTML("",messageBanner);
+		yield setInnerHTML("",messageBanner);
+		return IO.do(clearDocEventCapturing);
 	}
 }
 
