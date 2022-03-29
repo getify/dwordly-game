@@ -2,6 +2,8 @@
 
 Dwordly (Dwindling **Wordle**) is a flip-twist of the famous viral game. In Dwordly, there's no guessing or luck. Just use your expansive vocabulary to dwindle given words down to the shortest possible!
 
+**[-- PLAY HERE --](https://dwordly.fun)**
+
 [![Dwordly Screenshot](screenshot.png)](https://dwordly.fun)
 
 **[-- PLAY HERE --](https://dwordly.fun)**

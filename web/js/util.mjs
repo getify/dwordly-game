@@ -20,6 +20,7 @@ setElProp = curry(setElProp,3);
 getElProp = curry(getElProp,2);
 setElAttr = curry(setElAttr,3);
 getElAttr = curry(getElAttr,2);
+removeElAttr = curry(removeElAttr,2);
 addClass = curry(addClass,2);
 removeClass = curry(removeClass,2);
 setCSSVar = curry(setCSSVar,3);
@@ -50,6 +51,7 @@ export {
 	getElProp,
 	setElAttr,
 	getElAttr,
+	removeElAttr,
 	setInnerText,
 	getInnerText,
 	setInnerHTML,
@@ -63,6 +65,7 @@ export {
 	addClass,
 	removeClass,
 	setCSSVar,
+	matchMedia,
 	cancelEvent,
 	requestJSON,
 	getLSValue,
@@ -133,6 +136,10 @@ function getElAttr(attrName,el) {
 	return IO(() => el.getAttribute(attrName));
 }
 
+function removeElAttr(attrName,el) {
+	return IO(() => el.removeAttribute(attrName));
+}
+
 function addClass(className,el) {
 	return IO(() => el.classList.add(className));
 }
@@ -147,6 +154,10 @@ function setCSSVar(propName,value,el) {
 			el.style.setProperty(`--${propName}`,value);
 		}
 	});
+}
+
+function matchMedia(mq) {
+	return IO(({ win, }) => win.matchMedia ? win.matchMedia(mq) : undefined);
 }
 
 function *cancelEvent(env,evt) {

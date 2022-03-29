@@ -7,24 +7,211 @@
 	--horz-unit: calc(var(--play-width) / 100);
 	--header-text-size: calc(var(--play-width) / 12);
 
-	--color-transparent: rgba(0,0,0,0);
-	--color-black: #000;
-	--color-light-gray: #e3e3e3;
-	--color-medium-gray: #ccc;
-	--color-darker-gray: #999;
-	--color-darkest-gray: #384047;
+	--hidden-text-size: 0.001px;
+
+	--color-transparent: transparent;
+	--color-gray-1: #e3e3e3;
+	--color-gray-2: #ccc;
+	--color-gray-3: #999;
+	--color-gray-4: #444;
+	--color-gray-5: #384047;
+	--color-gray-6: #1b1f22;
 	--color-white: #fff;
 	--color-green: #538d4e;
 	--color-orange: #b59f3b;
-	--color-light-red: #e8caca;
 
-	--color-button-highlight: #fff12b;
 	--color-ok-score: var(--color-orange);
 	--color-good-score: var(--color-green);
-	--color-played-letter-background: var(--color-green);
+	--color-played-letter: var(--color-green);
 	--color-played-letter-text: var(--color-white);
-	--color-edit-letter-background: var(--color-orange);
+	--color-edit-letter: var(--color-orange);
 	--color-edit-letter-text: var(--color-white);
+	--color-played-words-selection-text: var(--color-orange);
+	--color-played-words-selection: var(--color-gray-1);
+
+	color-scheme: light dark;
+}
+:root, :root.force-light-mode {
+	--color-button-highlight: #fff12b;
+	--color-header-text: var(--color-gray-5);
+	--color-low-score: var(--color-gray-5);
+	--color-header-separator: var(--color-gray-2);
+	--color-message-banner: var(--color-gray-5);
+	--color-message-banner-text: var(--color-white);
+	--color-menu: var(--color-gray-1);
+	--color-menu-text: var(--color-gray-5);
+	--color-menu-btn: var(--color-white);
+	--color-menu-btn-text: var(--color-gray-5);
+	--color-menu-color-mode-selector: var(--color-gray-3);
+	--color-menu-color-mode-selector-thumb: var(--color-gray-5);
+	--color-help-popup: var(--color-gray-1);
+	--color-help-popup-text: var(--color-gray-5);
+	--color-help-tab: var(--color-white);
+	--color-help-tab-text: var(--color-gray-5);
+	--color-help-tab-active: var(--color-gray-5);
+	--color-help-tab-active-text: var(--color-white);
+	--color-help-link-text: var(--color-orange);
+	--color-next-word-separator: var(--color-gray-1);
+	--color-next-play-letter: var(--color-gray-5);
+	--color-keyboard-key: var(--color-gray-1);
+	--color-keyboard-key-text: var(--color-gray-5);
+	--color-help-selection: var(--color-gray-5);
+	--color-help-selection-text: var(--color-gray-1);
+
+	--active-btn-opacity: 0.8;
+
+	--image-menu-btn: url(../images/icon-menu.svg);
+	--image-help-btn: url(../images/icon-help.svg);
+	--image-close-btn: url(../images/icon-close.svg);
+	--image-menu-new-game-btn: url(../images/icon-play-new-game.svg);
+	--image-menu-help-btn: url(../images/icon-help.svg);
+	--image-undo-btn: url(../images/icon-undo.svg);
+	--image-undo-all-btn: url(../images/icon-undo-all.svg);
+	--image-remove-letter-btn: url(../images/icon-remove-letter.svg);
+	--image-insert-here-btn: url(../images/icon-insert-here.svg);
+	--image-add-letter-btn: url(../images/icon-add-letter.svg);
+	--image-play-word-btn: url(../images/icon-accept-changes.svg);
+	--image-reset-word-btn: url(../images/icon-abandon-changes.svg);
+	--image-animated-loader: url(../images/animated-loader.svg);
+	--image-animated-hand: url(../images/animated-hand.svg);
+	--image-help-letter: url(../images/help-letter.svg);
+	--image-help-letter-activated: url(../images/help-letter-activated.svg);
+	--image-help-keyboard-key: url(../images/help-keyboard-key.svg);
+	--image-help-remove-letter: url(../images/help-remove-letter.svg);
+	--image-help-insert-letter: url(../images/icon-add-letter.svg);
+	--image-help-insert-letter-position: url(../images/icon-insert-here.svg);
+	--image-help-play-word: url(../images/icon-accept-changes.svg);
+	--image-help-reset-move: url(../images/icon-abandon-changes.svg);
+	--image-help-undo: url(../images/icon-undo.svg);
+	--image-help-undo-all: url(../images/icon-undo-all.svg);
+	--image-help-example-1: url(../images/help-example-1.svg);
+	--image-help-example-2: url(../images/help-example-2.svg);
+
+	background-color: var(--color-white);
+}
+:root.force-light-mode {
+	color-scheme: light;
+}
+:root.force-dark-mode {
+	--color-button-highlight: var(--color-gray-1);
+	--color-header-text: var(--color-gray-1);
+	--color-low-score: var(--color-gray-1);
+	--color-header-separator: var(--color-gray-3);
+	--color-message-banner: var(--color-gray-2);
+	--color-message-banner-text: var(--color-gray-5);
+	--color-menu: var(--color-gray-5);
+	--color-menu-text: var(--color-gray-2);
+	--color-menu-btn: var(--color-gray-2);
+	--color-menu-btn-text: var(--color-gray-5);
+	--color-menu-color-mode-selector: var(--color-gray-6);
+	--color-menu-color-mode-selector-thumb: var(--color-orange);
+	--color-help-popup: var(--color-gray-5);
+	--color-help-popup-text: var(--color-gray-2);
+	--color-help-tab: var(--color-gray-2);
+	--color-help-tab-text: var(--color-gray-5);
+	--color-help-tab-active: var(--color-gray-6);
+	--color-help-tab-active-text: var(--color-white);
+	--color-help-link-text: var(--color-orange);
+	--color-next-word-separator: var(--color-gray-2);
+	--color-next-play-letter: var(--color-gray-2);
+	--color-keyboard-key: var(--color-gray-5);
+	--color-keyboard-key-text: var(--color-white);
+	--color-help-selection: var(--color-gray-1);
+	--color-help-selection-text: var(--color-gray-5);
+
+	--active-btn-opacity: 1.0;
+
+	--image-menu-btn: url(../images/dark-mode/icon-menu.svg);
+	--image-help-btn: url(../images/dark-mode/icon-help.svg);
+	--image-close-btn: url(../images/dark-mode/icon-close.svg);
+	--image-menu-new-game-btn: url(../images/dark-mode/icon-play-new-game.svg);
+	--image-menu-help-btn: url(../images/dark-mode/icon-menu-help.svg);
+	--image-undo-btn: url(../images/dark-mode/icon-undo.svg);
+	--image-undo-all-btn: url(../images/dark-mode/icon-undo-all.svg);
+	--image-remove-letter-btn: url(../images/dark-mode/icon-remove-letter.svg);
+	--image-insert-here-btn: url(../images/dark-mode/icon-insert-here.svg);
+	--image-add-letter-btn: url(../images/dark-mode/icon-add-letter.svg);
+	--image-play-word-btn: url(../images/dark-mode/icon-accept-changes.svg);
+	--image-reset-word-btn: url(../images/dark-mode/icon-abandon-changes.svg);
+	--image-animated-loader: url(../images/dark-mode/animated-loader.svg);
+	--image-animated-hand: url(../images/dark-mode/animated-hand.svg);
+	--image-help-letter: url(../images/dark-mode/help-letter.svg);
+	--image-help-letter-activated: url(../images/dark-mode/help-letter-activated.svg);
+	--image-help-keyboard-key: url(../images/dark-mode/help-keyboard-key.svg);
+	--image-help-remove-letter: url(../images/dark-mode/help-remove-letter.svg);
+	--image-help-insert-letter: url(../images/dark-mode/help-add-letter.svg);
+	--image-help-insert-letter-position: url(../images/dark-mode/icon-insert-here.svg);
+	--image-help-play-word: url(../images/dark-mode/help-accept-changes.svg);
+	--image-help-reset-move: url(../images/dark-mode/help-abandon-changes.svg);
+	--image-help-undo: url(../images/dark-mode/icon-undo.svg);
+	--image-help-undo-all: url(../images/dark-mode/icon-undo-all.svg);
+	--image-help-example-1: url(../images/dark-mode/help-example-1.svg);
+	--image-help-example-2: url(../images/dark-mode/help-example-2.svg);
+
+	color-scheme: dark;
+	background-color: var(--color-gray-6);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not(.force-light-mode) {
+		--color-button-highlight: var(--color-gray-1);
+		--color-header-text: var(--color-gray-1);
+		--color-low-score: var(--color-gray-1);
+		--color-header-separator: var(--color-gray-3);
+		--color-message-banner: var(--color-gray-2);
+		--color-message-banner-text: var(--color-gray-5);
+		--color-menu: var(--color-gray-5);
+		--color-menu-text: var(--color-gray-2);
+		--color-menu-btn: var(--color-gray-2);
+		--color-menu-btn-text: var(--color-gray-5);
+		--color-menu-color-mode-selector: var(--color-gray-6);
+		--color-menu-color-mode-selector-thumb: var(--color-orange);
+		--color-help-popup: var(--color-gray-5);
+		--color-help-popup-text: var(--color-gray-2);
+		--color-help-tab: var(--color-gray-2);
+		--color-help-tab-text: var(--color-gray-5);
+		--color-help-tab-active: var(--color-gray-6);
+		--color-help-tab-active-text: var(--color-white);
+		--color-help-link-text: var(--color-orange);
+		--color-next-word-separator: var(--color-gray-2);
+		--color-next-play-letter: var(--color-gray-2);
+		--color-keyboard-key: var(--color-gray-5);
+		--color-keyboard-key-text: var(--color-white);
+		--color-help-selection: var(--color-gray-1);
+		--color-help-selection-text: var(--color-gray-5);
+
+		--active-btn-opacity: 1.0;
+
+		--image-menu-btn: url(../images/dark-mode/icon-menu.svg);
+		--image-help-btn: url(../images/dark-mode/icon-help.svg);
+		--image-close-btn: url(../images/dark-mode/icon-close.svg);
+		--image-menu-new-game-btn: url(../images/dark-mode/icon-play-new-game.svg);
+		--image-menu-help-btn: url(../images/dark-mode/icon-menu-help.svg);
+		--image-undo-btn: url(../images/dark-mode/icon-undo.svg);
+		--image-undo-all-btn: url(../images/dark-mode/icon-undo-all.svg);
+		--image-remove-letter-btn: url(../images/dark-mode/icon-remove-letter.svg);
+		--image-insert-here-btn: url(../images/dark-mode/icon-insert-here.svg);
+		--image-add-letter-btn: url(../images/dark-mode/icon-add-letter.svg);
+		--image-play-word-btn: url(../images/dark-mode/icon-accept-changes.svg);
+		--image-reset-word-btn: url(../images/dark-mode/icon-abandon-changes.svg);
+		--image-animated-loader: url(../images/dark-mode/animated-loader.svg);
+		--image-animated-hand: url(../images/dark-mode/animated-hand.svg);
+		--image-help-letter: url(../images/dark-mode/help-letter.svg);
+		--image-help-letter-activated: url(../images/dark-mode/help-letter-activated.svg);
+		--image-help-keyboard-key: url(../images/dark-mode/help-keyboard-key.svg);
+		--image-help-remove-letter: url(../images/dark-mode/help-remove-letter.svg);
+		--image-help-insert-letter: url(../images/dark-mode/help-add-letter.svg);
+		--image-help-insert-letter-position: url(../images/dark-mode/icon-insert-here.svg);
+		--image-help-play-word: url(../images/dark-mode/help-accept-changes.svg);
+		--image-help-reset-move: url(../images/dark-mode/help-abandon-changes.svg);
+		--image-help-undo: url(../images/dark-mode/icon-undo.svg);
+		--image-help-undo-all: url(../images/dark-mode/icon-undo-all.svg);
+		--image-help-example-1: url(../images/dark-mode/help-example-1.svg);
+		--image-help-example-2: url(../images/dark-mode/help-example-2.svg);
+
+		color-scheme: dark;
+		background-color: var(--color-gray-6);
+	}
 }
 
 html {
@@ -79,7 +266,7 @@ header {
 	width: 100%;
 	height: min-content;
 	cursor: default;
-	border-bottom: thin solid var(--color-medium-gray);
+	border-bottom: thin solid var(--color-header-separator);
 }
 
 header > #menu-toggle-btn {
@@ -89,12 +276,12 @@ header > #menu-toggle-btn {
 	transform: translateY(-50%);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	border-radius: 15%;
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -104,14 +291,14 @@ header > #menu-toggle-btn::after {
 	width: var(--menu-button-size);
 	height: var(--menu-button-size);
 	border-radius: 15%;
-	background-image: url(../images/icon-menu.svg);
+	background-image: var(--image-menu-btn);
 	background-position: 0;
 	background-size: var(--menu-button-size);
 	background-repeat: no-repeat;
 }
 header > #menu-toggle-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 
 header > #help-btn {
@@ -121,12 +308,12 @@ header > #help-btn {
 	transform: translateY(-50%);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	border-radius: 50%;
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: help;
 }
@@ -136,21 +323,21 @@ header > #help-btn::after {
 	width: var(--help-button-size);
 	height: var(--help-button-size);
 	border-radius: 50%;
-	background-image: url(../images/icon-help.svg);
+	background-image: var(--image-help-btn);
 	background-position: 50% 50%;
 	background-size: calc(var(--help-button-size) * 0.6);
 	background-repeat: no-repeat;
 }
 header > #help-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 
 header > #title {
 	display: inline-block;
 	font-size: var(--header-text-size);
 	font-weight: bold;
-	color: var(--color-darkest-gray);
+	color: var(--color-header-text);
 	padding-top: var(--header-text-spacing);
 	padding-bottom: var(--header-text-spacing);
 }
@@ -162,7 +349,7 @@ header > #game-score {
 	transform: translateY(-50%);
 	font-weight: bold;
 	font-size: calc(var(--header-text-size) * 0.8);
-	color: var(--color-darkest-gray);
+	color: var(--color-low-score);
 }
 header > #game-score.ok {
 	color: var(--color-ok-score);
@@ -189,7 +376,8 @@ menu#main-menu {
 	padding: var(--menu-text-size);
 	padding-top: calc(var(--menu-text-size) * 2);
 	border-bottom-right-radius: calc(var(--horz-unit) * 2);
-	background-color: var(--color-light-gray);
+	color: var(--color-menu-text);
+	background-color: var(--color-menu);
 	box-shadow: 4px 4px 8px 1px rgba(0,0,0,0.34);
 }
 
@@ -207,12 +395,12 @@ menu#main-menu > #close-menu-btn {
 	height: var(--button-size);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	border-radius: 50%;
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -222,24 +410,20 @@ menu#main-menu > #close-menu-btn::after {
 	width: var(--button-size);
 	height: var(--button-size);
 	border-radius: 50%;
-	background-image: url(../images/icon-close.svg);
+	background-image: var(--image-close-btn);
 	background-position: 50% 50%;
 	background-size: calc(var(--button-size) * 0.6);
 	background-repeat: no-repeat;
 }
 menu#main-menu > #close-menu-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 
 menu#main-menu > li {
 	margin: 0;
 	padding: 0;
-	white-space: nowrap;
-	font-weight: bold;
-	font-size: var(--menu-text-size);
 }
-
 menu#main-menu > li button#new-game-btn {
 	--icon-size: calc(var(--menu-text-size) * 0.9);
 
@@ -247,15 +431,15 @@ menu#main-menu > li button#new-game-btn {
 	font-weight: bold;
 	font-size: var(--menu-text-size);
 	text-transform: uppercase;
-	background-color: var(--color-white);
+	white-space: nowrap;
 	outline: none;
-	color: var(--color-black);
-	border: thin solid var(--color-darker-gray);
+	background-color: var(--color-menu-btn);
+	color: var(--color-menu-btn-text);
+	border: thin solid var(--color-menu-btn-text);
 	border-radius: calc(var(--horz-unit) * 2);
 	padding:
 		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 1.1)
 		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 2);
-	margin-bottom: var(--menu-text-size);
 	cursor: pointer;
 }
 menu#main-menu > li button#new-game-btn:after {
@@ -267,31 +451,39 @@ menu#main-menu > li button#new-game-btn:after {
 	left: calc(var(--icon-size) / 2);
 	top: 50%;
 	transform: translateY(-50%);
-	background-image: url(../images/icon-play-new-game.svg);
+	background-image: var(--image-menu-new-game-btn);
 	background-position: 0;
 	background-size: var(--icon-size);
 	background-repeat: no-repeat;
 }
 menu#main-menu > li button#new-game-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
-
-menu#main-menu > li input[type=radio] {
+menu#main-menu > li#menu-difficulty-selector {
+	display: grid;
+	grid-template-columns: min-content min-content;
+	grid-template-rows: min-content;
+	margin:
+		calc(var(--horz-unit) * 4.5) 0
+		calc(var(--horz-unit) * 4.5) calc(var(--horz-unit) * 6);
+	gap: calc(var(--horz-unit) * 3);
+}
+menu#main-menu > li#menu-difficulty-selector input[type=radio] {
+	align-self: center;
 	width: calc(var(--horz-unit) * 6);
 	height: calc(var(--horz-unit) * 6);
-	margin:
-		calc(var(--horz-unit) * 3) 0
-		calc(var(--horz-unit) * 3) calc(var(--horz-unit) * 6);
-	vertical-align: middle;
 	cursor: pointer;
 }
-
-menu#main-menu > li input[type=radio] + label {
-	padding-left: calc(var(--horz-unit) * 2.5);
+menu#main-menu > li#menu-difficulty-selector input[type=radio] + label {
+	align-self: center;
+	color: var(--color-menu-text);
+	white-space: nowrap;
+	font-weight: bold;
+	font-size: var(--menu-text-size);
+	text-transform: uppercase;
 	cursor: pointer;
 }
-
 menu#main-menu > li button#menu-help-btn {
 	--icon-size: calc(var(--menu-text-size) * 0.9);
 
@@ -299,15 +491,15 @@ menu#main-menu > li button#menu-help-btn {
 	font-weight: bold;
 	font-size: var(--menu-text-size);
 	text-transform: uppercase;
-	background-color: var(--color-white);
+	white-space: nowrap;
 	outline: none;
-	color: var(--color-black);
-	border: thin solid var(--color-darker-gray);
+	background-color: var(--color-menu-btn);
+	color: var(--color-menu-btn-text);
+	border: thin solid var(--color-menu-btn-text);
 	border-radius: calc(var(--horz-unit) * 2);
 	padding:
 		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 1.1)
 		calc(var(--menu-text-size) / 3.5) calc(var(--menu-text-size) * 2);
-	margin-top: var(--menu-text-size);
 	cursor: pointer;
 }
 menu#main-menu > li button#menu-help-btn:after {
@@ -319,14 +511,96 @@ menu#main-menu > li button#menu-help-btn:after {
 	left: calc(var(--icon-size) / 2);
 	top: 50%;
 	transform: translateY(-50%);
-	background-image: url(../images/icon-help.svg);
+	background-image: var(--image-menu-help-btn);
 	background-position: 0;
 	background-size: var(--icon-size);
 	background-repeat: no-repeat;
 }
 menu#main-menu > li button#menu-help-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
+}
+menu#main-menu > li#menu-color-mode-selector {
+	--thumb-size: var(--menu-text-size);
+
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(3, min-content);
+	grid-template-rows: min-content;
+	margin-top:	calc(var(--horz-unit) * 6);
+}
+menu#main-menu > li#menu-color-mode-selector input[type=radio] {
+	position: absolute;
+	visibility: hidden;
+	font-size: var(--hidden-text-size);
+	width: var(--hidden-text-size);
+	height: var(--hidden-text-size);
+	opacity: 0;
+	left: -2000px;
+}
+menu#main-menu > li#menu-color-mode-selector input[type=radio] + label {
+	position: relative;
+	display: block;
+	align-self: center;
+	color: var(--color-menu-text);
+	white-space: nowrap;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: var(--thumb-size);
+	height: var(--thumb-size);
+	line-height: var(--thumb-size);
+	cursor: pointer;
+}
+menu#main-menu > li#menu-color-mode-selector div:first-child {
+	z-index: 10;
+}
+menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio] + label::after {
+	content: "";
+	display: inline-block;
+	position: relative;
+	top: calc(var(--thumb-size) / 6);
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
+	width: var(--thumb-size);
+	height: var(--thumb-size);
+	border-radius: 50%;
+	background-color: var(--color-menu-color-mode-selector-thumb);
+	visibility: hidden;
+	margin-left: calc(var(--horz-unit) * 3);
+}
+menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label::after {
+	visibility: visible;
+}
+menu#main-menu > li#menu-color-mode-selector div:nth-child(2) {
+	position: relative;
+	top: calc(var(--thumb-size) / 6);
+	align-self: center;
+	width: calc(var(--thumb-size) * 2);
+	margin: 0 calc(var(--thumb-size) * -1);
+	height: calc(var(--thumb-size));
+	z-index: 1;
+	background-color: var(--color-menu-color-mode-selector);
+	border-radius: calc(var(--thumb-size) / 2);
+}
+menu#main-menu > li#menu-color-mode-selector div:last-child {
+	z-index: 10;
+}
+menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + label::before {
+	content: "";
+	display: inline-block;
+	position: relative;
+	top: calc(var(--thumb-size) / 6);
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
+	width: var(--thumb-size);
+	height: var(--thumb-size);
+	border-radius: 50%;
+	background-color: var(--color-menu-color-mode-selector-thumb);
+	visibility: hidden;
+	margin-right: calc(var(--horz-unit) * 3);
+}
+menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label::before {
+	visibility: visible;
 }
 
 #play-area {
@@ -350,7 +624,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 	--play-action-btn-spacing: calc(var(--play-action-gutter-size) * 0.1);
 
 	--letter-insert-btn-size: calc(var(--letter-spacing) * 2.9);
-	--letter-remove-btn-size: calc(var(--letter-spacing) * 2.8);
+	--letter-remove-btn-size: calc(var(--letter-spacing) * 2.4);
 
 	--bottom-spacing: calc(var(--horz-unit) * 12);
 
@@ -380,7 +654,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 #played-words {
 	margin: calc(var(--letter-spacing) / 2) auto 0 auto;
 	padding-bottom: calc(var(--letter-spacing) / 2);
-	border-bottom: thin solid var(--color-darker-gray);
+	border-bottom: thin solid var(--color-next-word-separator);
 }
 
 #played-words > div:nth-child(2) {
@@ -394,11 +668,11 @@ menu#main-menu > li button#menu-help-btn:focus {
 	position: absolute;
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -420,14 +694,14 @@ menu#main-menu > li button#menu-help-btn:focus {
 	background-repeat: no-repeat;
 }
 #undo-btn::after {
-	background-image: url(../images/icon-undo.svg);
+	background-image: var(--image-undo-btn);
 }
 #undo-all-btn::after {
-	background-image: url(../images/icon-undo-all.svg);
+	background-image: var(--image-undo-all-btn);
 }
 #undo-btn:focus, #undo-all-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 #undo-btn:disabled, #undo-all-btn:disabled {
 	display: none;
@@ -456,10 +730,22 @@ menu#main-menu > li button#menu-help-btn:focus {
 	border-bottom: thin solid var(--color-transparent);
 }
 
+/* specifically allow selection (and copy) of text in
+   played words list */
+#played-words > #played-words-list span {
+	-webkit-user-select: text !important;
+	user-select: text !important;
+	cursor: default !important;
+}
+#played-words > #played-words-list span::selection {
+	color: var(--color-played-words-selection-text);
+	background-color: var(--color-played-words-selection);
+}
+
 #played-words > #played-words-list > li.word > .letter > span {
-	background-color: var(--color-played-letter-background);
-	color: white;
-	border-color: var(--color-played-letter-background);
+	background-color: var(--color-played-letter);
+	color: var(--color-played-letter-text);
+	border-color: var(--color-played-letter);
 }
 
 #played-words.complete > #played-words-list > li.word:last-child {
@@ -502,9 +788,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 .word > .letter > input[type=radio] {
 	position: absolute;
 	visibility: hidden;
-	font-size: 0.001px;
-	width: 0.001px;
-	height: 0.001px;
+	font-size: var(--hidden-text-size);
+	width: var(--hidden-text-size);
+	height: var(--hidden-text-size);
 	opacity: 0;
 	left: -2000px;
 }
@@ -523,15 +809,15 @@ menu#main-menu > li button#menu-help-btn:focus {
 	font-size: calc(var(--letter-size) * 0.75);
 	font-weight: bold;
 	text-align: center;
-	color: var(--color-darkest-gray);
-	border: thin solid var(--color-darkest-gray);
+	color: var(--color-next-play-letter);
+	border: thin solid var(--color-next-play-letter);
 	border-radius: calc(var(--horz-unit) * 0.75);
 }
 
 .word > .letter > input[type=radio]:checked + label {
 	color: var(--color-edit-letter-text);
-	border-color: var(--color-edit-letter-background);
-	background-color: var(--color-edit-letter-background);
+	border-color: var(--color-edit-letter);
+	background-color: var(--color-edit-letter);
 }
 
 .word > .letter > .remove-letter-btn {
@@ -543,12 +829,11 @@ menu#main-menu > li button#menu-help-btn:focus {
 	transform: translate(50%,65%);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
-	border-radius: 50%;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -557,9 +842,8 @@ menu#main-menu > li button#menu-help-btn:focus {
 	display: block;
 	width: var(--letter-remove-btn-size);
 	height: var(--letter-remove-btn-size);
-	border-radius: 50%;
-	background-image: url(../images/icon-remove-letter.svg);
-	background-position: 50% 50%;
+	background-image: var(--image-remove-letter-btn);
+	background-position: 0 0;
 	background-size: calc(var(--letter-remove-btn-size) * 0.8);
 	background-repeat: no-repeat;
 }
@@ -579,12 +863,12 @@ menu#main-menu > li button#menu-help-btn:focus {
 	transform: translate(-50%,70%);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	border-radius: 50%;
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -603,7 +887,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 	width: var(--letter-insert-btn-size);
 	height: var(--letter-insert-btn-size);
 	border-radius: 50%;
-	background-image: url(../images/icon-insert-here.svg);
+	background-image: var(--image-insert-here-btn);
 	background-position: 50% 50%;
 	background-size: calc(var(--letter-insert-btn-size) * 0.65);
 	background-repeat: no-repeat;
@@ -634,11 +918,11 @@ menu#main-menu > li button#menu-help-btn:focus {
 	flex-basis: auto;
 	width: var(--play-action-btn-size);
 	height: var(--play-action-btn-size);
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -647,7 +931,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 }
 #play-action-buttons > button:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 #play-action-buttons > button:after {
 	content: "";
@@ -659,13 +943,13 @@ menu#main-menu > li button#menu-help-btn:focus {
 	background-repeat: no-repeat;
 }
 #play-action-buttons > button#insert-letter-btn:after {
-	background-image: url(../images/icon-add-letter.svg);
+	background-image: var(--image-add-letter-btn);
 }
 #play-action-buttons > button#play-word-btn:after {
-	background-image: url(../images/icon-accept-changes.svg);
+	background-image: var(--image-play-word-btn);
 }
 #play-action-buttons > button#reset-word-btn:after {
-	background-image: url(../images/icon-abandon-changes.svg);
+	background-image: var(--image-reset-word-btn);
 }
 
 #keyboard {
@@ -695,9 +979,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 	flex-basis: auto;
 	width: var(--key-width);
 	height: var(--key-height);
-	background-color: var(--color-light-gray);
-	color: var(--color-darkest-gray);
-	border: thin solid var(--color-darkest-gray);
+	background-color: var(--color-keyboard-key);
+	color: var(--color-keyboard-key-text);
+	border: thin solid var(--color-keyboard-key-text);
 	border-radius: calc(var(--key-width) / 5);
 	font-size: calc(var(--key-width) * 0.8);
 	line-height: var(--key-height);
@@ -722,9 +1006,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 #loading {
 	display: block;
 	position: fixed;
-	color: transparent;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	color: var(--color-transparent);
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%,-50%);
@@ -738,7 +1022,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 	display: block;
 	width: var(--img-width);
 	height: var(--img-height);
-	background-image: url(../images/animated-loader.svg);
+	background-image: var(--image-animated-loader);
 	background-position: 0;
 	background-size: var(--img-width) var(--img-height);
 	background-repeat: no-repeat;
@@ -750,9 +1034,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 #hand-hint {
 	display: block;
 	position: absolute;
-	color: transparent;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	color: var(--color-transparent);
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	transform: translate(-50%,-50%);
 	z-index: 1000;
 }
@@ -763,7 +1047,7 @@ menu#main-menu > li button#menu-help-btn:focus {
 	display: block;
 	width: var(--img-size);
 	height: var(--img-size);
-	background-image: url(../images/animated-hand.svg);
+	background-image: var(--image-animated-hand);
 	background-position: 0;
 	background-size: var(--img-size);
 	background-repeat: no-repeat;
@@ -772,24 +1056,34 @@ menu#main-menu > li button#menu-help-btn:focus {
 #message-banner {
 	display: block;
 	position: fixed;
-	background-color: var(--color-darkest-gray);
-	color: var(--color-white);
+	background-color: var(--color-message-banner);
+	color: var(--color-message-banner-text);
 	font-weight: bold;
 	font-size: calc(var(--horz-unit) * 5);
-	width: 60%;
+	width: 70%;
 	min-width: calc(var(--play-width) * 0.7);
 	max-width: var(--play-width);
 	left: 50%;
 	top: calc(var(--header-text-size) * 2.1);
 	transform: translateX(-50%);
 	padding: calc(var(--horz-unit) * 4);
-	border: thin solid var(--color-white);
+	border: thin solid var(--color-message-banner-text);
 	border-radius: calc(var(--horz-unit) * 1.5);
 	text-align: center;
 	z-index: 1000;
+
+	/* specifically allow selection (and copy) of text in
+   	   message banner */
+	-webkit-user-select: text !important;
+	user-select: text !important;
+	cursor: default !important;
 }
 #message-banner.hidden {
 	display: none;
+}
+#message-banner::selection {
+	color: var(--color-message-banner);
+	background-color: var(--color-message-banner-text);
 }
 
 #help-popup {
@@ -805,15 +1099,15 @@ menu#main-menu > li button#menu-help-btn:focus {
 	left: 50%;
 	top: calc(var(--header-text-size) * 2.1);
 	transform: translateX(-50%);
-	background-color: var(--color-light-gray);
-	border: var(--horz-unit) solid var(--color-darkest-gray);
+	background-color: var(--color-help-popup);
+	border: var(--horz-unit) solid var(--color-help-popup-text);
 	border-radius: calc(var(--horz-unit) * 3);
 	padding: calc(var(--horz-unit) * 4);
 	font-size: var(--help-text-size);
 	z-index: 1000;
 }
 #help-popup a, #help-popup a:visited {
-	color: var(--color-orange);
+	color: var(--color-help-link-text);
 }
 #help-popup.hidden {
 	display: none;
@@ -828,12 +1122,12 @@ menu#main-menu > li button#menu-help-btn:focus {
 	height: var(--button-size);
 	padding: 0;
 	margin: 0;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	border-radius: 50%;
 	outline: none;
-	color: transparent;
-	background: transparent;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
 	border: none;
 	cursor: pointer;
 }
@@ -843,14 +1137,14 @@ menu#main-menu > li button#menu-help-btn:focus {
 	width: var(--button-size);
 	height: var(--button-size);
 	border-radius: 50%;
-	background-image: url(../images/icon-close.svg);
+	background-image: var(--image-close-btn);
 	background-position: 50% 50%;
 	background-size: calc(var(--button-size) * 0.6);
 	background-repeat: no-repeat;
 }
 #help-popup > #close-help-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
-	opacity: 0.8;
+	opacity: var(--active-btn-opacity);
 }
 #help-popup p:nth-of-type(1) {
 	margin-top: calc(var(--help-text-size) * 1.1);
@@ -859,8 +1153,8 @@ menu#main-menu > li button#menu-help-btn:focus {
 	--icon-size: calc(var(--help-text-size) * 1.5);
 
 	display: inline-block;
-	font-size: 0.001px;
-	line-height: 0.001px;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
 	vertical-align: middle;
 }
 #help-popup i::after {
@@ -873,36 +1167,36 @@ menu#main-menu > li button#menu-help-btn:focus {
 	background-repeat: no-repeat;
 }
 #help-popup i#help-letter::after {
-	background-image: url(../images/help-letter.svg);
+	background-image: var(--image-help-letter);
 }
 #help-popup i#help-activated-letter::after {
-	background-image: url(../images/help-letter-activated.svg);
+	background-image: var(--image-help-letter-activated);
 }
 #help-popup i#help-keyboard-key::after {
 	width: calc(var(--icon-size) * 0.75);
 	background-size: calc(var(--icon-size) * 0.75) var(--icon-size);
-	background-image: url(../images/help-keyboard-key.svg);
+	background-image: var(--image-help-keyboard-key);
 }
 #help-popup i#help-remove-letter::after {
-	background-image: url(../images/help-remove-letter.svg);
+	background-image: var(--image-help-remove-letter);
 }
 #help-popup i#help-insert-letter::after {
-	background-image: url(../images/icon-add-letter.svg);
+	background-image: var(--image-help-insert-letter);
 }
 #help-popup i#help-insert-letter-position::after {
-	background-image: url(../images/icon-insert-here.svg);
+	background-image: var(--image-help-insert-letter-position);
 }
 #help-popup i#help-play-word::after {
-	background-image: url(../images/icon-accept-changes.svg);
+	background-image: var(--image-help-play-word);
 }
 #help-popup i#help-reset-move::after {
-	background-image: url(../images/icon-abandon-changes.svg);
+	background-image: var(--image-help-reset-move);
 }
 #help-popup i#help-undo::after {
-	background-image: url(../images/icon-undo.svg);
+	background-image: var(--image-help-undo);
 }
 #help-popup i#help-undo-all::after {
-	background-image: url(../images/icon-undo-all.svg);
+	background-image: var(--image-help-undo-all);
 }
 #help-popup > #help-content-tabs {
 	position: relative;
@@ -916,9 +1210,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 #help-popup > #help-content-tabs > li > input[type=radio] {
 	position: absolute;
 	visibility: hidden;
-	font-size: 0.001px;
-	width: 0.001px;
-	height: 0.001px;
+	font-size: var(--hidden-text-size);
+	width: var(--hidden-text-size);
+	height: var(--hidden-text-size);
 	opacity: 0;
 	left: -2000px;
 }
@@ -928,17 +1222,17 @@ menu#main-menu > li button#menu-help-btn:focus {
 	font-size: var(--tab-text-size);
 	font-weight: bold;
 	text-transform: uppercase;
-	background-color: var(--color-white);
-	color: var(--color-darkest-gray);
-	border: thin solid var(--color-darkest-gray);
+	background-color: var(--color-help-tab);
+	color: var(--color-help-tab-text);
+	border: thin solid var(--color-help-tab-text);
 	padding: calc(var(--tab-text-size) * 0.25) calc(var(--tab-text-size) * 0.75);
 	border-radius: calc(var(--tab-text-size) / 3);
 	cursor: pointer;
 	white-space: nowrap;
 }
 #help-popup > #help-content-tabs > li > input[type=radio]:checked + label {
-	background-color: var(--color-darkest-gray);
-	color: var(--color-white);
+	background-color: var(--color-help-tab-active);
+	color: var(--color-help-tab-active-text);
 	cursor: default;
 }
 #help-popup > section {
@@ -960,9 +1254,9 @@ menu#main-menu > li button#menu-help-btn:focus {
 	--img-height: calc(var(--img-width) * 1.364);
 }
 #help-example-1, #help-example-2 {
-	font-size: 0.001px;
-	line-height: 0.001px;
-	color: transparent;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
+	color: var(--color-transparent);
 }
 #help-example-1::after, #help-example-2::after {
 	content: "";
@@ -974,8 +1268,25 @@ menu#main-menu > li button#menu-help-btn:focus {
 	background-repeat: no-repeat;
 }
 #help-example-1::after {
-	background-image: url(../images/help-example-1.svg);
+	background-image: var(--image-help-example-1);
 }
 #help-example-2::after {
-	background-image: url(../images/help-example-2.svg);
+	background-image: var(--image-help-example-2);
+}
+
+/* specifically allow selection (and copy) of text in
+   help popup */
+#help-popup > p,
+#help-popup > p > a,
+#help-popup > section p,
+#help-popup > section a,
+#help-popup > section strong,
+#help-example-games > div {
+	-webkit-user-select: text !important;
+	user-select: text !important;
+	cursor: default !important;
+}
+#help-popup ::selection {
+	color: var(--color-help-selection-text);
+	background-color: var(--color-help-selection);
 }

@@ -5,6 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 <meta name="Description" content="A game where words dwindle down to the shortest possible">
+<meta name="color-scheme" content="light dark">
 
 <link rel="stylesheet" href="css/style.css">
 <script>
@@ -14,6 +15,25 @@ if (document.documentElement && document.documentElement.style && document.docum
 	let height = Math.max(300,document.documentElement.clientHeight);
 	document.documentElement.style.setProperty("--vw-unit",`${(width / 100).toFixed(1)}px`);
 	document.documentElement.style.setProperty("--vh-unit",`${(height / 100).toFixed(1)}px`);
+}
+// light/dark mode image preloads
+{
+	window.PRELOAD_IMAGES = Object.freeze(["icon-menu.svg","icon-help.svg","icon-close.svg","icon-play-new-game.svg","icon-help.svg","icon-undo.svg","icon-undo-all.svg","icon-remove-letter.svg","icon-insert-here.svg","icon-add-letter.svg","icon-accept-changes.svg","icon-abandon-changes.svg","animated-loader.svg","animated-hand.svg","help-letter.svg","help-letter-activated.svg","help-keyboard-key.svg","help-remove-letter.svg","icon-add-letter.svg","icon-insert-here.svg","icon-accept-changes.svg","icon-abandon-changes.svg","icon-undo.svg","icon-undo-all.svg","help-example-1.svg","help-example-2.svg",]);
+	let colorMode = window.localStorage ? window.localStorage.getItem("color-mode") : undefined;
+	if (![ "light", "dark", ].includes(colorMode)) {
+		colorMode = (window.matchMedia && window.matchMedia("(prefers-color-scheme:dark)").matches) ? "dark" : "light";
+	}
+	if (document.documentElement) {
+		document.documentElement.classList.add(`force-${colorMode}-mode`);
+	}
+	for (let imgName of PRELOAD_IMAGES) {
+		let link = document.createElement("link");
+		link.rel = "preload";
+		link.href = `images/${colorMode=="dark"?"dark-mode/":""}${imgName}`;
+		link.as = "image";
+		link.addEventListener("load",() => link.setAttribute("data-loaded","true"),{ once: true, });
+		document.head.appendChild(link);
+	}
 }
 </script>
 </head>
@@ -31,16 +51,21 @@ if (document.documentElement && document.documentElement.style && document.docum
 <menu role="menu" id="main-menu" class="hidden" aria-hidden="true" aria-label="main menu">
 	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
 	<li role="none"><button type="button" id="new-game-btn" role="menuitem" aria-label="start a new game">new game</button></li>
-	<li role="none">
-		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" role="menuitem" aria-label="Select easy game mode" checked><label for="easy-difficulty"> easy</label>
-	</li>
-	<li role="none">
+	<li role="none" id="menu-difficulty-selector">
+		<input type="radio" name="difficulty-selector" id="easy-difficulty" value="easy" role="menuitem" aria-label="Select easy game mode"><label for="easy-difficulty"> easy</label>
 		<input type="radio" name="difficulty-selector" id="medium-difficulty" value="medium" role="menuitem" aria-label="Select medium game mode"><label for="medium-difficulty"> medium</label>
-	</li>
-	<li role="none">
 		<input type="radio" name="difficulty-selector" id="hard-difficulty" value="hard" role="menuitem" aria-label="Select hard game mode"><label for="hard-difficulty"> hard</label>
 	</li>
 	<li role="none"><button type="button" id="menu-help-btn" role="menuitem" aria-controls="help-popup" aria-expanded="false" aria-label="Open the help and game instructions">help</button></li>
+	<li role="menuitem" id="menu-color-mode-selector">
+		<div>
+			<input type="radio" name="color-mode-selector" id="light-color-mode" value="light" aria-label="Select light mode color scheme"><label for="light-color-mode">light</label>
+		</div>
+		<div></div>
+		<div>
+			<input type="radio" name="color-mode-selector" id="dark-color-mode" value="dark" aria-label="Select dark mode color scheme"><label for="dark-color-mode">dark</label>
+		</div>
+	</li>
 </menu>
 <div id="play-area" class="hidden" aria-label="Play the game here">
 	<div id="played-words">
@@ -114,7 +139,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
 		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
-		<p>Version: <strong>0.5.6</strong> | <strong><a href="https://forms.gle/JaqALq1H27NavxnE9" target="_blank">FEEDBACK SURVEY</a></strong></p>
+		<p>Version: <strong>0.6.0</strong> | <strong><a href="https://forms.gle/JaqALq1H27NavxnE9" target="_blank">FEEDBACK SURVEY</a></strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
 	</section>
 </div>

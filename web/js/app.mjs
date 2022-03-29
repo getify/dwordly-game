@@ -1,7 +1,6 @@
 import IO from "monio/io";
 import {
 	applyIO,
-	doIOBind,
 	match,
 	iAnd,
 	iNot,
@@ -27,6 +26,7 @@ import {
 	getElProp,
 	setElAttr,
 	getElAttr,
+	removeElAttr,
 	setInnerText,
 	getInnerText,
 	setInnerHTML,
@@ -40,6 +40,7 @@ import {
 	addClass,
 	removeClass,
 	setCSSVar,
+	matchMedia,
 	cancelEvent,
 	getLSValue,
 	setLSValue,
@@ -65,6 +66,9 @@ function *main({ window: win, document: doc, } = {}) {
 		win,
 		doc,
 		docEventsCaptured: null,
+
+		// pull global variable from inline <script>
+		PRELOAD_IMAGES: yield IO(() => win.PRELOAD_IMAGES),
 
 		// get DOM element references
 		loadingEl: yield getElement("loading"),
@@ -111,10 +115,16 @@ function *main({ window: win, document: doc, } = {}) {
 	viewContext.state.difficulty = (
 		[ "easy", "medium", "hard", ].includes(difficulty) ? difficulty : "easy"
 	);
+	let colorMode = yield applyIO(getLSValue("color-mode"),viewContext);
+	viewContext.state.colorMode = (
+		[ "light", "dark", ].includes(colorMode) ? colorMode : "default"
+	);
 
 	// get more DOM element references
 	viewContext.difficultySelectorEls =
 		yield findElements("input[name=difficulty-selector]",viewContext.mainMenuEl);
+	viewContext.colorModeSelectorEls =
+		yield findElements("input[name=color-mode-selector]",viewContext.mainMenuEl);
 	viewContext.nextPlayFormEl = yield findElement("form",viewContext.nextPlayEl);
 	viewContext.keyboardFormEl = yield findElement("form",viewContext.keyboardEl);
 	viewContext.keyboardBtns = yield findElements("button",viewContext.keyboardEl);
@@ -129,6 +139,7 @@ function *runApp({
 	menuToggleBtn,
 	mainMenuEl,
 	difficultySelectorEls,
+	colorModeSelectorEls,
 	helpBtn,
 	helpCloseBtn,
 	helpContentTabsEl,
@@ -152,6 +163,9 @@ function *runApp({
 	// resize events, and force re-compute
 	// of viewport dimensions
 	yield IO.do(listenToScreenOrientationChanges);
+
+	// listen for changes to color mode
+	yield IO.do(listenToColorModeChanges);
 
 	// listen for window resizes and re-compute
 	// the viewport dimensions, as used by the
@@ -188,8 +202,8 @@ function *runApp({
 		IOx.onEvent(mainMenuEl,"click"),
 	]);
 
-	// handle difficulty selector changes
-	yield doIOxBackground(onChangeDifficulty,[
+	// handle menu selector (difficulty, color-mode) changes
+	yield doIOxBackground(onMenuSelectorChange,[
 		IOx.onEvent(mainMenuEl,"change"),
 	]);
 
@@ -258,6 +272,9 @@ function *runApp({
 	if (difficultyEl) {
 		yield setElAttr("checked","",difficultyEl);
 	}
+
+	// ensure color-mode selector is initialized
+	yield IO.do(updateColorModeSelector);
 
 	// start a new game
 	yield IO.do(onNewGame);
@@ -403,16 +420,90 @@ function *onMainMenuClicks({ mainMenuEl, },evt) {
 	}
 }
 
+function *onMenuSelectorChange(viewContext,evt) {
+	return match(
+		$=>matches("[id$=-difficulty]",evt.target),$=>[
+			IO.do(onChangeDifficulty,evt),
+		],
+		$=>matches("[id$=-color-mode]",evt.target),$=>[
+			IO.do(onChangeColorMode,evt),
+		],
+	);
+}
+
 function *onChangeDifficulty({ difficultySelectorEls, state, },evt) {
-	if (yield matches("[id$=-difficulty]",evt.target)) {
-		let selectedDifficultyEl = yield IO(() => (
-			difficultySelectorEls.find(el => el.checked)
-		));
-		let difficulty = yield getElProp("value",selectedDifficultyEl);
-		if ([ "easy", "medium", "hard", ].includes(difficulty)) {
-			state.difficulty = difficulty;
-			return setLSValue("difficulty-level",difficulty);
+	var selectedDifficultyEl = yield IO(() => (
+		difficultySelectorEls.find(el => el.checked)
+	));
+	var difficulty = yield getElProp("value",selectedDifficultyEl);
+	if ([ "easy", "medium", "hard", ].includes(difficulty)) {
+		state.difficulty = difficulty;
+		return setLSValue("difficulty-level",difficulty);
+	}
+}
+
+function *onChangeColorMode({ doc, colorModeSelectorEls, state, },evt) {
+	var selectedColorModeEl = yield IO(() => (
+		colorModeSelectorEls.find(el => el.checked)
+	));
+	var colorMode = yield getElProp("value",selectedColorModeEl);
+	if ([ "light", "dark", ].includes(colorMode)) {
+		state.colorMode = colorMode;
+		yield setLSValue("color-mode",colorMode);
+		return IO.do(updateColorModeCSS);
+	}
+}
+
+function *updateColorModeSelector({ colorModeSelectorEls, state: { colorMode, }, }) {
+	// if color mode is still default, pull preference
+	// from system
+	if (colorMode == "default") {
+		colorMode = yield IO.do(detectSystemColorMode);
+	}
+
+	var colorModeEl = yield IO(() => (
+		colorModeSelectorEls.find(el => el.value == colorMode)
+	));
+	if (colorModeEl) {
+		for (let el of colorModeSelectorEls) {
+			yield removeElAttr("checked",el);
 		}
+		yield setElAttr("checked","",colorModeEl);
+	}
+}
+
+function *updateColorModeCSS({ doc, PRELOAD_IMAGES, state: { colorMode, }, }) {
+	// if color mode is still default, pull preference
+	// from system
+	if (colorMode == "default") {
+		colorMode = yield IO.do(detectSystemColorMode);
+	}
+
+	// toggle the <html> element's CSS class for color-mode application
+	yield removeClass("force-light-mode",doc.documentElement);
+	yield removeClass("force-dark-mode",doc.documentElement);
+	yield addClass(`force-${colorMode}-mode`,doc.documentElement);
+
+	// remove any existing (and complete) preload elements from the <head>
+	var preloadEls = yield findElements("link[rel=preload][data-loaded=true]",doc.head);
+	for (let el of preloadEls) {
+		yield removeElement(el);
+	}
+
+	// preload the images for this color mode
+	for (let imgName of PRELOAD_IMAGES) {
+		let linkEl = yield createElement("link");
+		yield setElAttr("rel","preload",linkEl);
+		yield setElAttr(
+			"href",
+			`images/${colorMode == "dark" ? "dark-mode/" : "" }${imgName}`,
+			linkEl
+		);
+		yield setElAttr("as","image",linkEl);
+		IOx.onceEvent(linkEl,"load")
+			.map(() => linkEl.setAttribute("data-loaded","true"))
+			.run();
+		yield appendChild(doc.head,linkEl);
 	}
 }
 
@@ -988,10 +1079,15 @@ function *showMessageBanner({ doc, messageBanner, },message) {
 	if (yield matches(".hidden",messageBanner)) {
 		yield removeClass("hidden",messageBanner);
 
-		// doc events close the message banner
+		// listen for doc events (outside message-banner) to close it
 		let { all: docEvents, } =
-			yield IO.do(initDocEventCapturing,/*subscribe=*/true);
-		return doIOxBackground(hideMessageBanner,[ docEvents, ]);
+			yield IO.do(initDocEventCapturing,/*subscribe=*/false);
+		return doIOxBackground(function *onDocEvent(viewContext,evt){
+			// click was NOT on the message-banner itself?
+			if (!messageBanner.contains(evt.target)) {
+				return IO.do(hideMessageBanner);
+			}
+		},[ docEvents, ]);
 	}
 }
 
@@ -1098,7 +1194,7 @@ function *computeViewportDimensions({ doc, }) {
 }
 
 function *listenToScreenOrientationChanges(viewContext) {
-	var computeCB = doIOBind(computeViewportDimensions,viewContext);
+	var computeCB = (...args) => IO.do(computeViewportDimensions,...args).run(viewContext);
 	var { win, } = viewContext;
 
 	// work-arounds for browsers that don't fire "resize" when
@@ -1115,7 +1211,7 @@ function *listenToScreenOrientationChanges(viewContext) {
 	//    fixing_how_css_vwvh_units_arent/gp61ghe/
 	// ref: https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList/matches
 	else if (typeof win.matchMedia != "undefined") {
-		let query = win.matchMedia("(orientation: landscape)");
+		let query = yield matchMedia("(orientation:landscape)");
 
 		// handle variances in the event handling in various older browsers
 		if (typeof query.addEventListener != "undefined") {
@@ -1126,6 +1222,43 @@ function *listenToScreenOrientationChanges(viewContext) {
 		}
 		else {
 			query.onchange = computeCB;
+		}
+	}
+}
+
+// detect the current color-mode (light vs dark) for the system
+function *detectSystemColorMode(viewContext,mq) {
+	if (!mq) {
+		mq = yield matchMedia("(prefers-color-scheme:dark)");
+	}
+
+	// does the device currently prefer dark or lightd mode?
+	return mq.matches ? "dark" : "light";
+}
+
+function *onSystemColorModeChange({ state, },evt) {
+	if (state.colorMode == "default") {
+		yield IO.do(updateColorModeSelector);
+		return IO.do(updateColorModeCSS);
+	}
+}
+
+function *listenToColorModeChanges(viewContext) {
+	var changeCB = (...args) => IO.do(onSystemColorModeChange,...args).run(viewContext);
+	var { win, } = viewContext;
+
+	if (typeof win.matchMedia != "undefined") {
+		let query = yield matchMedia("(prefers-color-scheme:dark)");
+
+		// handle variances in the event handling in various older browsers
+		if (typeof query.addEventListener != "undefined") {
+			query.addEventListener("change",changeCB,false);
+		}
+		else if (typeof query.addListener != "undefined") {
+			query.addListener(changeCB);
+		}
+		else {
+			query.onchange = changeCB;
 		}
 	}
 }
