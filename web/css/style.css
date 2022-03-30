@@ -65,6 +65,7 @@
 	--image-close-btn: url(../images/icon-close.svg);
 	--image-menu-new-game-btn: url(../images/icon-play-new-game.svg);
 	--image-menu-help-btn: url(../images/icon-help.svg);
+	--image-next-play-marker: url(../images/icon-next-play-marker.svg);
 	--image-undo-btn: url(../images/icon-undo.svg);
 	--image-undo-all-btn: url(../images/icon-undo-all.svg);
 	--image-remove-letter-btn: url(../images/icon-remove-letter.svg);
@@ -126,6 +127,7 @@
 	--image-close-btn: url(../images/dark-mode/icon-close.svg);
 	--image-menu-new-game-btn: url(../images/dark-mode/icon-play-new-game.svg);
 	--image-menu-help-btn: url(../images/dark-mode/icon-menu-help.svg);
+	--image-next-play-marker: url(../images/dark-mode/icon-next-play-marker.svg);
 	--image-undo-btn: url(../images/dark-mode/icon-undo.svg);
 	--image-undo-all-btn: url(../images/dark-mode/icon-undo-all.svg);
 	--image-remove-letter-btn: url(../images/dark-mode/icon-remove-letter.svg);
@@ -187,6 +189,7 @@
 		--image-close-btn: url(../images/dark-mode/icon-close.svg);
 		--image-menu-new-game-btn: url(../images/dark-mode/icon-play-new-game.svg);
 		--image-menu-help-btn: url(../images/dark-mode/icon-menu-help.svg);
+		--image-next-play-marker: url(../images/dark-mode/icon-next-play-marker.svg);
 		--image-undo-btn: url(../images/dark-mode/icon-undo.svg);
 		--image-undo-all-btn: url(../images/dark-mode/icon-undo-all.svg);
 		--image-remove-letter-btn: url(../images/dark-mode/icon-remove-letter.svg);
@@ -465,9 +468,9 @@ menu#main-menu > li#menu-difficulty-selector {
 	grid-template-columns: min-content min-content;
 	grid-template-rows: min-content;
 	margin:
-		calc(var(--horz-unit) * 4.5) 0
-		calc(var(--horz-unit) * 4.5) calc(var(--horz-unit) * 6);
-	gap: calc(var(--horz-unit) * 3);
+		calc(var(--horz-unit) * 6) 0
+		calc(var(--horz-unit) * 10) calc(var(--horz-unit) * 6);
+	gap: calc(var(--horz-unit) * 4);
 }
 menu#main-menu > li#menu-difficulty-selector input[type=radio] {
 	align-self: center;
@@ -527,7 +530,7 @@ menu#main-menu > li#menu-color-mode-selector {
 	display: grid;
 	grid-template-columns: repeat(3, min-content);
 	grid-template-rows: min-content;
-	margin-top:	calc(var(--horz-unit) * 6);
+	margin-top:	calc(var(--horz-unit) * 10);
 }
 menu#main-menu > li#menu-color-mode-selector input[type=radio] {
 	position: absolute;
@@ -759,9 +762,27 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 	padding-top: calc(var(--letter-spacing) / 2);
 	margin: 0 auto var(--bottom-spacing) auto;
 }
-
 #next-play.hidden {
 	display: none;
+}
+
+#next-play-marker {
+	--marker-width: calc(var(--horz-unit) * 3);
+	--marker-height: calc(var(--marker-width) * 1.6);
+
+	position: absolute;
+	left: calc(var(--marker-width) * -1.2);
+	top: calc((var(--letter-size) - var(--marker-height)) / 2);
+}
+#next-play-marker::after {
+	content: "";
+	display: block;
+	width: var(--marker-width);
+	height: var(--marker-height);
+	background-image: var(--image-next-play-marker);
+	background-position: 0 0;
+	background-size: var(--marker-width) var(--marker-height);
+	background-repeat: no-repeat;
 }
 
 .word {
@@ -773,18 +794,15 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 	width: var(--word-size);
 	height: var(--letter-size);
 }
-
 .word > .letter {
 	position: relative;
 	width: var(--letter-size);
 	height: var(--letter-size);
 	margin-right: var(--letter-spacing);
 }
-
 .word > .letter:last-child {
 	margin: 0;
 }
-
 .word > .letter > input[type=radio] {
 	position: absolute;
 	visibility: hidden;
@@ -794,11 +812,9 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 	opacity: 0;
 	left: -2000px;
 }
-
 .word > .letter > input[type=radio] + label {
 	cursor: pointer;
 }
-
 .word > .letter > input[type=radio] + label,
 .word > .letter > span {
 	display: block;
@@ -813,13 +829,11 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 	border: thin solid var(--color-next-play-letter);
 	border-radius: calc(var(--horz-unit) * 0.75);
 }
-
 .word > .letter > input[type=radio]:checked + label {
 	color: var(--color-edit-letter-text);
 	border-color: var(--color-edit-letter);
 	background-color: var(--color-edit-letter);
 }
-
 .word > .letter > .remove-letter-btn {
 	display: none;
 	position: absolute;
@@ -853,7 +867,6 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 .word > .letter > input[type=radio]:checked + label + .remove-letter-btn {
 	display: block;
 }
-
 .word > .letter > .insert-here-btn {
 	display: block;
 	position: absolute;
@@ -895,7 +908,6 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 .word > .letter > .insert-here-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 }
-
 .word > .letter > button:disabled {
 	display: none !important;
 }
