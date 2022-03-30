@@ -491,7 +491,7 @@ function *updateColorModeCSS({ doc, PRELOAD_IMAGES, state: { colorMode, }, }) {
 	}
 
 	// preload the images for this color mode
-	for (let imgName of PRELOAD_IMAGES) {
+	for (let imgName of PRELOAD_IMAGES[colorMode]) {
 		let linkEl = yield createElement("link");
 		yield setElAttr("rel","preload",linkEl);
 		yield setElAttr(
