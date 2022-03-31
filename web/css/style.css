@@ -42,6 +42,7 @@
 	--color-menu-text: var(--color-gray-5);
 	--color-menu-btn: var(--color-white);
 	--color-menu-btn-text: var(--color-gray-5);
+	--color-menu-link: var(--color-green);
 	--color-menu-color-mode-selector: var(--color-gray-3);
 	--color-menu-color-mode-selector-thumb: var(--color-gray-5);
 	--color-help-popup: var(--color-gray-1);
@@ -104,6 +105,7 @@
 	--color-menu-text: var(--color-gray-2);
 	--color-menu-btn: var(--color-gray-2);
 	--color-menu-btn-text: var(--color-gray-5);
+	--color-menu-link: var(--color-orange);
 	--color-menu-color-mode-selector: var(--color-gray-6);
 	--color-menu-color-mode-selector-thumb: var(--color-orange);
 	--color-help-popup: var(--color-gray-5);
@@ -166,6 +168,7 @@
 		--color-menu-text: var(--color-gray-2);
 		--color-menu-btn: var(--color-gray-2);
 		--color-menu-btn-text: var(--color-gray-5);
+		--color-menu-link: var(--color-orange);
 		--color-menu-color-mode-selector: var(--color-gray-6);
 		--color-menu-color-mode-selector-thumb: var(--color-orange);
 		--color-help-popup: var(--color-gray-5);
@@ -383,11 +386,9 @@ menu#main-menu {
 	background-color: var(--color-menu);
 	box-shadow: 4px 4px 8px 1px rgba(0,0,0,0.34);
 }
-
 menu#main-menu.hidden {
 	display: none;
 }
-
 menu#main-menu > #close-menu-btn {
 	--button-size: calc(var(--menu-text-size) * 1.8);
 
@@ -422,7 +423,6 @@ menu#main-menu > #close-menu-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
-
 menu#main-menu > li {
 	margin: 0;
 	padding: 0;
@@ -522,6 +522,18 @@ menu#main-menu > li button#menu-help-btn:after {
 menu#main-menu > li button#menu-help-btn:focus {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
+}
+menu#main-menu > li#word-suggestion-link,
+menu#main-menu > li#feedback-link {
+	margin-top: calc(var(--horz-unit) * 6);
+}
+menu#main-menu > li#word-suggestion-link > a,
+menu#main-menu > li#word-suggestion-link > a:visited,
+menu#main-menu > li#feedback-link > a,
+menu#main-menu > li#feedback-link > a:visited {
+	color: var(--color-menu-link);
+	font-size: calc(var(--menu-text-size) * 0.8);
+	white-space: nowrap;
 }
 menu#main-menu > li#menu-color-mode-selector {
 	--thumb-size: var(--menu-text-size);
