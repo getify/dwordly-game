@@ -100,6 +100,8 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<button type="button" disabled>A</button><button type="button" disabled>S</button><button type="button" disabled>D</button><button type="button" disabled>F</button><button type="button" disabled>G</button><button type="button" disabled>H</button><button type="button" disabled>J</button><button type="button" disabled>K</button><button type="button" disabled>L</button>
 
 	<button type="button" disabled>Z</button><button type="button" disabled>X</button><button type="button" disabled>C</button><button type="button" disabled>V</button><button type="button" disabled>B</button><button type="button" disabled>N</button><button type="button" disabled>M</button>
+
+	<div id="keyboard-disabled-banner" aria-label="Notice indicating how to enable the keyboard to change a letter in the next-play word area">To use the keyboard, tap a letter tile <i id="banner-letter" aria-label="Letter tile in the next-play area that can be activated"></i> above to activate it <i id="banner-activated-letter" aria-label="Activated letter tile"></i>.</div>
 </form></div>
 
 <div id="loading">Loading... please wait.</div>
@@ -141,7 +143,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<p>Play ends at 1-letter words (A or I).</p>
 	</section>
 	<section id="help-instructions-content" class="hidden" aria-labelledby="help-instructions-tab-text" role="tabpanel">
-		<p>Tap any letter <i id="help-letter" aria-label="Letter in the next-play area that can be activated"></i> to activate <i id="help-activated-letter" aria-label="Activated letter"></i> it. Then tap any <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> to change the letter or tap <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
+		<p>Tap any letter <i id="help-letter" aria-label="Letter tile in the next-play area that can be activated"></i> to activate <i id="help-activated-letter" aria-label="Activated letter tile"></i> it. Then tap any <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> to change the letter or tap <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
 		<p>Tap <i id="help-insert-letter" aria-label="Start letter-insert mode"></i> and <i id="help-insert-letter-position" aria-label="Choose where a new letter should be inserted: start of word, end of word, or between two letters"></i> to insert a new letter.</p>
 		<p>Tap <i id="help-play-word" aria-label="Attempt to play the current word"></i> to complete a move if it's a valid word or <i id="help-reset-move" aria-label="Reset current word"></i> to reset a move.</p>
 		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different words and improve your score <strong>%</strong> percent.</p>
@@ -149,7 +151,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
 		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
-		<p>Version: <strong>0.6.4</strong></p>
+		<p>Version: <strong>0.6.5</strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
 	</section>
 </div>

@@ -75,7 +75,8 @@ function *main({ window: win, document: doc, } = {}) {
 		handHintEl: null,
 		helpBtn: yield getElement("help-btn"),
 		scoreEl: yield getElement("game-score"),
-		messageBanner: yield getElement("message-banner"),
+		messageBannerEl: yield getElement("message-banner"),
+		keyboardBannerEl: yield getElement("keyboard-disabled-banner"),
 		helpPopupEl: yield getElement("help-popup"),
 		helpCloseBtn: yield getElement("close-help-btn"),
 		helpContentTabsEl: yield getElement("help-content-tabs"),
@@ -675,6 +676,7 @@ function *onNextPlayWordClicks(viewContext,evt) {
 
 function *updatePlayMode(
 	{
+		keyboardBannerEl,
 		nextPlayFormEl,
 		insertLetterBtn,
 		playWordBtn,
@@ -767,6 +769,10 @@ function *updatePlayMode(
 			IO.do(updateInsertButtons,/*enable=*/false),
 			IO.do(updateRemoveButtons,/*enable=*/false),
 			IO.do(updateKeyboard,/*enable=*/false),
+
+			// force-hide the keyboard banner when the game
+			// is over
+			addClass("hidden",keyboardBannerEl),
 		]
 	);
 }
@@ -1049,7 +1055,7 @@ function *updateRemoveButtons({ nextPlayFormEl, },enable = true) {
 	return IO.do(updateElements,buttons,enable);
 }
 
-function *updateKeyboard({ keyboardBtns, state, },enable) {
+function *updateKeyboard({ keyboardBannerEl, keyboardBtns, state, },enable) {
 	// make sure any previous hand hint has been hidden
 	yield IO.do(hideHandHint);
 
@@ -1066,6 +1072,13 @@ function *updateKeyboard({ keyboardBtns, state, },enable) {
 		});
 	}
 
+	if (enable) {
+		yield addClass("hidden",keyboardBannerEl);
+	}
+	else {
+		yield removeClass("hidden",keyboardBannerEl);
+	}
+
 	return IO.do(updateElements,keyboardBtns,enable);
 }
 
@@ -1073,29 +1086,29 @@ function *scrollDownPlayArea({ playAreaEl, }) {
 	return setElProp("scrollTop",1E9,playAreaEl);
 }
 
-function *showMessageBanner({ doc, messageBanner, },message) {
-	yield setInnerHTML(message,messageBanner);
-	yield setElAttr("aria-live","polite",messageBanner);
-	if (yield matches(".hidden",messageBanner)) {
-		yield removeClass("hidden",messageBanner);
+function *showMessageBanner({ doc, messageBannerEl, },message) {
+	yield setInnerHTML(message,messageBannerEl);
+	yield setElAttr("aria-live","polite",messageBannerEl);
+	if (yield matches(".hidden",messageBannerEl)) {
+		yield removeClass("hidden",messageBannerEl);
 
 		// listen for doc events (outside message-banner) to close it
 		let { all: docEvents, } =
 			yield IO.do(initDocEventCapturing,/*subscribe=*/false);
 		return doIOxBackground(function *onDocEvent(viewContext,evt){
 			// click was NOT on the message-banner itself?
-			if (!messageBanner.contains(evt.target)) {
+			if (!messageBannerEl.contains(evt.target)) {
 				return IO.do(hideMessageBanner);
 			}
 		},[ docEvents, ]);
 	}
 }
 
-function *hideMessageBanner({ messageBanner, }) {
-	if (!(yield matches(".hidden",messageBanner))) {
-		yield addClass("hidden",messageBanner);
-		yield setElAttr("aria-live","off",messageBanner);
-		yield setInnerHTML("",messageBanner);
+function *hideMessageBanner({ messageBannerEl, }) {
+	if (!(yield matches(".hidden",messageBannerEl))) {
+		yield addClass("hidden",messageBannerEl);
+		yield setElAttr("aria-live","off",messageBannerEl);
+		yield setInnerHTML("",messageBannerEl);
 		return IO.do(clearDocEventCapturing);
 	}
 }
