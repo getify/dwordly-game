@@ -100,6 +100,7 @@ function *main({ window: win, document: doc, } = {}) {
 			maxWordLength: 0,
 			playedWords: [],
 			pendingNextWord: null,
+			activeLetter: null,
 			hints: {
 				letterHandHintShown: false,
 				keyboardHandHintShown: false,
@@ -698,6 +699,11 @@ function *updatePlayMode(
 	// make sure help-popup is closed
 	yield IO.do(closeHelp);
 
+	// reset active-letter state (if necessary)
+	if (![ 1, 2, ].includes(playMode)) {
+		state.activeLetter = null;
+	}
+
 	return match(
 		// initial (or reset) state?
 		playMode == 0, $=>[
@@ -779,7 +785,7 @@ function *updatePlayMode(
 	);
 }
 
-function *onToggleOnNextPlayLetter(viewContext,evt) {
+function *onToggleOnNextPlayLetter({ nextPlayFormEl, state, },evt) {
 	// make sure to hide the hand hint
 	yield IO.do(hideHandHint);
 
@@ -787,6 +793,8 @@ function *onToggleOnNextPlayLetter(viewContext,evt) {
 
 	// toggling on a letter?
 	if (radioEl) {
+		let labelEl = yield findElement("input[type=radio]:checked + label",nextPlayFormEl);
+		state.activeLetter = yield getInnerText(labelEl);
 		yield IO.do(scrollDownPlayArea);
 		return IO.do(updatePlayMode,/*nextPlayMode=*/1);
 	}
@@ -806,12 +814,13 @@ function *onToggleOffNextPlayLetter({ state, },evt) {
 	}
 }
 
-function *onStartInsertLetter(viewContext) {
+function *onStartInsertLetter({ keyboardBannerEl, }) {
 	// make sure to hide the hand hint
 	yield IO.do(hideHandHint);
 
 	yield IO.do(scrollDownPlayArea);
-	return IO.do(updatePlayMode,/*nextPlayMode=*/3);
+	yield IO.do(updatePlayMode,/*nextPlayMode=*/3);
+	return addClass("hidden",keyboardBannerEl);
 }
 
 function *onPickInsertPosition({ playAreaEl, nextPlayFormEl, state, },evt) {
@@ -839,24 +848,26 @@ function *onPickInsertPosition({ playAreaEl, nextPlayFormEl, state, },evt) {
 	return IO.do(updatePlayMode,/*nextPlayMode=*/4);
 }
 
-function *onRemoveLetter({ nextPlayFormEl, state, },evt) {
+function *onRemoveLetter({ nextPlayFormEl, keyboardBannerEl, state, },evt) {
 	var letterEl = yield closest(".letter",evt.target);
 	var letters = yield findElements(".letter",nextPlayFormEl);
 	var removeIdx = letters.findIndex(el => el === letterEl);
 	var nextWord =
 		`${state.pendingNextWord.slice(0,removeIdx)}${state.pendingNextWord.slice(removeIdx+1)}`;
 	yield IO.do(renderNextPlayWord,nextWord);
-	return IO.do(updatePlayMode,/*nextPlayMode=*/5);
+	yield IO.do(updatePlayMode,/*nextPlayMode=*/5);
+
+	// hide keyboard-disabled banner while a
+	// letter removal is pending
+	return addClass("hidden",keyboardBannerEl);
 }
 
 function *onResetWord({
 	playAreaEl,
-	state: {
-		maxWordLength,
-	}
+	state,
 }) {
 	yield IO.do(renderNextPlayWord);
-	yield setCSSVar("max-letter-count",maxWordLength,playAreaEl);
+	yield setCSSVar("max-letter-count",state.maxWordLength,playAreaEl);
 	yield IO.do(scrollDownPlayArea);
 	return IO.do(updatePlayMode,/*nextPlayMode=*/0);
 }
@@ -1057,23 +1068,41 @@ function *updateRemoveButtons({ nextPlayFormEl, },enable = true) {
 	return IO.do(updateElements,buttons,enable);
 }
 
-function *updateKeyboard({ keyboardBannerEl, keyboardBtns, state, },enable) {
+function *updateKeyboard(
+	{
+		keyboardBannerEl,
+		keyboardFormEl,
+		keyboardBtns,
+		state,
+	},
+	enable
+) {
 	// make sure any previous hand hint has been hidden
 	yield IO.do(hideHandHint);
+
+	// which keyboard key (if any) corresponds to the
+	// currently activated letter in the next-play word?
+	var currentKeyEl = (
+		(enable && state.activeLetter && /^[A-Z]$/.test(state.activeLetter)) ?
+			(yield findElement(`button[value='${state.activeLetter}']`,keyboardFormEl)) :
+			undefined
+	);
 
 	// should we show the hand hint on the keyboard?
 	if (enable && !state.hints.keyboardHandHintShown) {
 		state.hints.keyboardHandHintShown = true;
 		yield setLSValue("keyboard-hand-hint-shown","true");
 
-		let aKeyEl = keyboardBtns[10];
-		yield IO.do(showHandHint,aKeyEl,{
+		let letterToSelect = (currentKeyEl && state.activeLetter == "A") ? "Q" : "A";
+		let keyEl = yield findElement(`button[value='${letterToSelect}']`,keyboardFormEl);
+		yield IO.do(showHandHint,keyEl,{
 			left: "50%",
 			top: "85%",
 			transform: "translateX(-50%)",
 		});
 	}
 
+	// toggle showing the keyboard-disabled banner
 	if (enable) {
 		yield addClass("hidden",keyboardBannerEl);
 	}
@@ -1081,7 +1110,13 @@ function *updateKeyboard({ keyboardBannerEl, keyboardBtns, state, },enable) {
 		yield removeClass("hidden",keyboardBannerEl);
 	}
 
-	return IO.do(updateElements,keyboardBtns,enable);
+	// enable/disable the keyboard buttons
+	yield IO.do(updateElements,keyboardBtns,enable);
+
+	// disable the currently active letter's key?
+	if (currentKeyEl) {
+		return disableEl(currentKeyEl);
+	}
 }
 
 function *scrollDownPlayArea({ playAreaEl, }) {
