@@ -7,6 +7,8 @@
 <meta name="Description" content="A game where words dwindle down to the shortest possible">
 <meta name="color-scheme" content="light dark">
 
+<link rel="canonical" href="https://dwordly.fun/" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <link rel="stylesheet" href="css/style.css">
 <script>
 // compute the vw/vh units more reliably than CSS does itself
@@ -101,7 +103,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 
 	<button type="button" disabled>Z</button><button type="button" disabled>X</button><button type="button" disabled>C</button><button type="button" disabled>V</button><button type="button" disabled>B</button><button type="button" disabled>N</button><button type="button" disabled>M</button>
 
-	<div id="keyboard-disabled-banner" aria-label="Notice indicating how to enable the keyboard to change a letter in the next-play word area">To use the keyboard, tap a letter tile <i id="banner-letter" aria-label="Letter tile in the next-play area that can be activated"></i> above to activate it <i id="banner-activated-letter" aria-label="Activated letter tile"></i>.</div>
+	<div id="keyboard-disabled-banner" aria-label="Notice indicating how to enable the keyboard to change a letter in the next-play word area">To use the keyboard, tap a letter tile <i id="banner-letter" aria-label="Letter tile in the next-play area that can be activated"></i> above to activate <i id="banner-activated-letter" aria-label="Activated letter tile"></i> it.</div>
 </form></div>
 
 <div id="loading">Loading... please wait.</div>
@@ -111,9 +113,9 @@ if (document.documentElement && document.documentElement.style && document.docum
 <div id="help-popup" class="hidden">
 	<button type="button" id="close-help-btn" aria-label="Close the help popup"></button>
 
-	<p>Dwindle the starting word down to a 1-letter word, in the fewest moves.<p>
-	<p>No lucky guessing here&mdash;unlike other word games!&mdash;just clever word play.</p>
-	<p>Try playing games in 3 difficulty levels.</p>
+	<p>Dwindle starting word down to a 1-letter word (<em>A</em> or <em>I</em>), in the fewest moves.<p>
+	<p>Make a valid word for each move by picking one letter to <em>change</em>, <em>remove</em>, or <em>add</em>.</p>
+	<p><em>Score %</em> shows how optimal your play is.</p>
 
 	<hr>
 
@@ -125,7 +127,6 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<li><input type="radio" name="help-content-selector" id="help-about-tab" aria-controls="help-about-content" aria-selected="false" role="tab"> <label for="help-about-tab" id="help-about-tab-text" aria-label="See information about this game and its creator">about</label></li>
 	</ul>
 	<section id="help-example-content" aria-labelledby="help-example-tab-text" role="tabpanel">
-		<p>For each move: <strong>change</strong> a letter, <strong>remove</strong> a letter, or <strong>add</strong> a letter. Each move must make a valid word&mdash;no repeats.</p>
 		<div id="help-example-games">
 			<div id="help-example-1" aria-label="Game example: SOUR > OUR > OAR > MAR > ...">
 				SOUR
@@ -140,18 +141,18 @@ if (document.documentElement && document.documentElement.style && document.docum
 				I
 			</div>
 		</div>
-		<p>Play ends at 1-letter words (A or I).</p>
+		<p>Try words from 3 difficulty levels!</p>
 	</section>
 	<section id="help-instructions-content" class="hidden" aria-labelledby="help-instructions-tab-text" role="tabpanel">
 		<p>Tap any letter <i id="help-letter" aria-label="Letter tile in the next-play area that can be activated"></i> to activate <i id="help-activated-letter" aria-label="Activated letter tile"></i> it. Then tap any <i id="help-keyboard-key" aria-label="On-screen keyboard key"></i> to change the letter or tap <i id="help-remove-letter" aria-label="Remove the highlighted letter"></i> to remove it.</p>
-		<p>Tap <i id="help-insert-letter" aria-label="Start letter-insert mode"></i> and <i id="help-insert-letter-position" aria-label="Choose where a new letter should be inserted: start of word, end of word, or between two letters"></i> to insert a new letter.</p>
-		<p>Tap <i id="help-play-word" aria-label="Attempt to play the current word"></i> to complete a move if it's a valid word or <i id="help-reset-move" aria-label="Reset current word"></i> to reset a move.</p>
-		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different words and improve your score <strong>%</strong> percent.</p>
+		<p>Tap <i id="help-insert-letter" aria-label="Start letter-insert mode"></i> then <i id="help-insert-letter-position" aria-label="Choose where a new letter should be inserted: start of word, end of word, or between two letters"></i> to insert a letter.</p>
+		<p>Tap <i id="help-play-word" aria-label="Attempt to play the current word"></i> to submit a move or tap <i id="help-reset-move" aria-label="Reset current word"></i> to reset the move.</p>
+		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different moves and <em>improve your score %.</em></p>
 	</section>
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
 		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
-		<p>Version: <strong>0.6.5</strong></p>
+		<p>Version: <strong>0.6.6</strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
 	</section>
 </div>

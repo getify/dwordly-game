@@ -341,12 +341,13 @@ function *closeMenu(viewContext) {
 	}
 }
 
-function *onToggleHelp({ doc, helpBtn, helpPopupEl, }) {
+function *onToggleHelp({ doc, keyboardBannerEl, helpBtn, helpPopupEl, }) {
 	// help popup currently closed?
 	if (yield matches(".hidden",helpPopupEl)) {
 		yield IO.do(hideMessageBanner);
 		yield IO.do(closeMenu);
 
+		yield addClass("help-showing",keyboardBannerEl);
 		yield removeClass("hidden",helpPopupEl);
 		yield setElAttr("aria-hidden","false",helpPopupEl);
 		yield setElAttr("aria-expanded","true",helpBtn);
@@ -392,8 +393,9 @@ function *onSwitchHelpContentTab({ helpPopupEl, helpContentTabsEl, },evt) {
 	}
 }
 
-function *closeHelp({ helpBtn, helpPopupEl, }) {
+function *closeHelp({ keyboardBannerEl, helpBtn, helpPopupEl, }) {
 	if (!(yield matches(".hidden",helpPopupEl))) {
+		yield removeClass("help-showing",keyboardBannerEl);
 		yield addClass("hidden",helpPopupEl);
 		yield setElAttr("aria-hidden","true",helpPopupEl);
 		yield setElAttr("aria-expanded","false",helpBtn);

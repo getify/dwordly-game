@@ -5,7 +5,7 @@
 		<animate
 			attributeName="opacity"
 			dur="2s"
-			values="0.5;1;0.5"
+			values="0.2;1;0.2"
 			repeatCount="indefinite"
 			begin="0.1"/>
 	</path>
