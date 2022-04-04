@@ -596,7 +596,11 @@ menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio] +
 	visibility: hidden;
 	margin-left: calc(var(--horz-unit) * 3);
 }
+menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label {
+	pointer-events: none;
+}
 menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label::after {
+	pointer-events: auto;
 	visibility: visible;
 }
 menu#main-menu > li#menu-color-mode-selector div:nth-child(2) {
@@ -627,7 +631,11 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	visibility: hidden;
 	margin-right: calc(var(--horz-unit) * 3);
 }
+menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label {
+	pointer-events: none;
+}
 menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label::before {
+	pointer-events: auto;
 	visibility: visible;
 }
 
@@ -1028,10 +1036,10 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:ch
 #keyboard > form > button:disabled {
 	opacity: 0.3;
 }
-#keyboard > form > button:nth-child(11) {
+#keyboard > form > button[value=A] {
 	margin-left: calc(var(--key-width) * 0.6);
 }
-#keyboard > form > button:nth-child(19) {
+#keyboard > form > button[value=L] {
 	margin-right: calc(var(--key-width) * 0.6);
 }
 #keyboard > form > #keyboard-disabled-banner {

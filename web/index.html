@@ -72,7 +72,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<div>
 			<input type="radio" name="color-mode-selector" id="light-color-mode" value="light" aria-label="Select light mode color scheme"><label for="light-color-mode">light</label>
 		</div>
-		<div></div>
+		<div id="color-mode-selector-track" aria-hidden="true"></div>
 		<div>
 			<input type="radio" name="color-mode-selector" id="dark-color-mode" value="dark" aria-label="Select dark mode color scheme"><label for="dark-color-mode">dark</label>
 		</div>
@@ -97,13 +97,13 @@ if (document.documentElement && document.documentElement.style && document.docum
 	</form></div>
 </div>
 <div id="keyboard" aria-label="On-screen keyboard"><form role="none">
+	<div id="keyboard-disabled-banner" aria-label="Notice indicating how to enable the keyboard buttons to change a letter in the next-play word area">To change a letter, tap its tile <i id="banner-letter" aria-label="Letter tile in the next-play area that can be activated"></i> above to activate <i id="banner-activated-letter" aria-label="Activated letter tile"></i> it.</div>
+
 	<button type="button" value="Q" disabled>Q</button><button type="button" value="W" disabled>W</button><button type="button" value="E" disabled>E</button><button type="button" value="R" disabled>R</button><button type="button" value="T" disabled>T</button><button type="button" value="Y" disabled>Y</button><button type="button" value="U" disabled>U</button><button type="button" value="I" disabled>I</button><button type="button" value="O" disabled>O</button><button type="button" value="P" disabled>P</button>
 
 	<button type="button" value="A" disabled>A</button><button type="button" value="S" disabled>S</button><button type="button" value="D" disabled>D</button><button type="button" value="F" disabled>F</button><button type="button" value="G" disabled>G</button><button type="button" value="H" disabled>H</button><button type="button" value="J" disabled>J</button><button type="button" value="K" disabled>K</button><button type="button" value="L" disabled>L</button>
 
 	<button type="button" value="Z" disabled>Z</button><button type="button" value="X" disabled>X</button><button type="button" value="C" disabled>C</button><button type="button" value="V" disabled>V</button><button type="button" value="B" disabled>B</button><button type="button" value="N" disabled>N</button><button type="button" value="M" disabled>M</button>
-
-	<div id="keyboard-disabled-banner" aria-label="Notice indicating how to enable the keyboard to change a letter in the next-play word area">To use the keyboard, tap a letter tile <i id="banner-letter" aria-label="Letter tile in the next-play area that can be activated"></i> above to activate <i id="banner-activated-letter" aria-label="Activated letter tile"></i> it.</div>
 </form></div>
 
 <div id="loading">Loading... please wait.</div>
@@ -150,9 +150,9 @@ if (document.documentElement && document.documentElement.style && document.docum
 		<p>Tap <i id="help-undo" aria-label="Undo most recent played word"></i> or <i id="help-undo-all" aria-label="Undo all played words in the current game"></i> to back up and try different moves and <em>improve your score %.</em></p>
 	</section>
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
-		<p>Made with love for those who enjoy playing word games but not having to make lucky guesses.</p>
+		<p>For those who enjoy playing word games but not having to make lucky guesses!</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
-		<p>Version: <strong>0.6.8</strong></p>
+		<p>Version: <strong>0.6.9</strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
 	</section>
 </div>

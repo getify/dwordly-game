@@ -82,6 +82,7 @@ function *main({ window: win, document: doc, } = {}) {
 		helpContentTabsEl: yield getElement("help-content-tabs"),
 		menuToggleBtn: yield getElement("menu-toggle-btn"),
 		mainMenuEl: yield getElement("main-menu"),
+		colorModeEl: yield getElement("menu-color-mode-selector"),
 		playAreaEl: yield getElement("play-area"),
 		playedWordsEl: yield getElement("played-words"),
 		playedWordsListEl: yield getElement("played-words-list"),
@@ -101,6 +102,7 @@ function *main({ window: win, document: doc, } = {}) {
 			playedWords: [],
 			pendingNextWord: null,
 			activeLetter: null,
+			colorModeMouseDown: false,
 			hints: {
 				letterHandHintShown: false,
 				keyboardHandHintShown: false,
@@ -126,7 +128,7 @@ function *main({ window: win, document: doc, } = {}) {
 	viewContext.difficultySelectorEls =
 		yield findElements("input[name=difficulty-selector]",viewContext.mainMenuEl);
 	viewContext.colorModeSelectorEls =
-		yield findElements("input[name=color-mode-selector]",viewContext.mainMenuEl);
+		yield findElements("input[name=color-mode-selector]",viewContext.colorModeEl);
 	viewContext.nextPlayFormEl = yield findElement("form",viewContext.nextPlayEl);
 	viewContext.keyboardFormEl = yield findElement("form",viewContext.keyboardEl);
 	viewContext.keyboardBtns = yield findElements("button",viewContext.keyboardEl);
@@ -141,6 +143,7 @@ function *runApp({
 	menuToggleBtn,
 	mainMenuEl,
 	difficultySelectorEls,
+	colorModeEl,
 	colorModeSelectorEls,
 	helpBtn,
 	helpCloseBtn,
@@ -201,7 +204,11 @@ function *runApp({
 
 	// handle main-menu clicks
 	yield doIOxBackground(onMainMenuClicks,[
-		IOx.onEvent(mainMenuEl,"click"),
+		merge([
+			IOx.onEvent(colorModeEl,"mousedown"),
+			IOx.onEvent(colorModeEl,"mousemove"),
+			IOx.onEvent(mainMenuEl,"click"),
+		]),
 	]);
 
 	// handle menu selector (difficulty, color-mode) changes
@@ -404,23 +411,49 @@ function *closeHelp({ keyboardBannerEl, helpBtn, helpPopupEl, }) {
 	}
 }
 
-function *onMainMenuClicks({ mainMenuEl, },evt) {
+function *onMainMenuClicks({ mainMenuEl, colorModeEl, state, },evt) {
 	var target = evt.target;
 
 	// main menu visible?
 	if (yield iNot(matches(".hidden",mainMenuEl))) {
-		return match(
-			// clicked on close button?
-			$=>matches("#close-menu-btn",target), $=>[
-				onToggleMainMenu,
-			],
-			$=>matches("#menu-help-btn",target), $=>[
-				onToggleHelp,
-			],
-			$=>matches("#new-game-btn",target), $=>[
-				onNewGame,
-			]
-		);
+		if (evt.type == "click") {
+			state.colorModeMouseDown = false;
+			return match(
+				// clicked on close button?
+				$=>matches("#close-menu-btn",target), $=>[
+					onToggleMainMenu,
+				],
+				$=>matches("#menu-help-btn",target), $=>[
+					onToggleHelp,
+				],
+				$=>matches("#new-game-btn",target), $=>[
+					onNewGame,
+				]
+			);
+		}
+		// tracking mousedown/mousemove events on color-mode selector
+		else {
+			// did we start dragging the color-mode selector thumb?
+			if (
+				evt.type == "mousedown" && !state.colorModeMouseDown &&
+				(yield matches("input[type=radio]:checked + label",evt.target))
+			) {
+				state.colorModeMouseDown = true;
+			}
+			// have we dragged it toward the not-yet-active option?
+			else if (
+				evt.type == "mousemove" && state.colorModeMouseDown &&
+				(yield matches("#color-mode-selector-track, input[type=radio]:not(:checked) + label",evt.target))
+			) {
+				state.colorModeMouseDown = false;
+
+				// toggle color mode selection
+				let colorModeSelectorEl = yield findElement("input[type=radio]:not(:checked)",colorModeEl);
+				state.colorMode = yield getElAttr("value",colorModeSelectorEl);
+				yield IO.do(updateColorModeSelector);
+				yield IO.do(onChangeColorMode);
+			}
+		}
 	}
 }
 
@@ -454,7 +487,8 @@ function *onChangeColorMode({ doc, colorModeSelectorEls, state, },evt) {
 	if ([ "light", "dark", ].includes(colorMode)) {
 		state.colorMode = colorMode;
 		yield setLSValue("color-mode",colorMode);
-		return IO.do(updateColorModeCSS);
+		yield IO.do(updateColorModeCSS);
+		return IO.do(updateColorModeSelector);
 	}
 }
 
@@ -465,14 +499,15 @@ function *updateColorModeSelector({ colorModeSelectorEls, state: { colorMode, },
 		colorMode = yield IO.do(detectSystemColorMode);
 	}
 
-	var colorModeEl = yield IO(() => (
+	var colorModeSelectorEl = yield IO(() => (
 		colorModeSelectorEls.find(el => el.value == colorMode)
 	));
-	if (colorModeEl) {
+	if (colorModeSelectorEl) {
 		for (let el of colorModeSelectorEls) {
 			yield removeElAttr("checked",el);
 		}
-		yield setElAttr("checked","",colorModeEl);
+		yield setElAttr("checked","",colorModeSelectorEl);
+		return setElProp("checked",true,colorModeSelectorEl);
 	}
 }
 
@@ -777,10 +812,6 @@ function *updatePlayMode(
 			IO.do(updateInsertButtons,/*enable=*/false),
 			IO.do(updateRemoveButtons,/*enable=*/false),
 			IO.do(updateKeyboard,/*enable=*/false),
-
-			// force-hide the keyboard banner when the game
-			// is over
-			addClass("hidden",keyboardBannerEl),
 		]
 	);
 }
@@ -1103,7 +1134,7 @@ function *updateKeyboard(
 	}
 
 	// toggle showing the keyboard-disabled banner
-	if (enable) {
+	if (enable || state.playedWords.length > 1) {
 		yield addClass("hidden",keyboardBannerEl);
 	}
 	else {
