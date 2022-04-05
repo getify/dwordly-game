@@ -314,11 +314,12 @@ function *runApp({
 	}
 }
 
-function *onToggleMainMenu({ doc, menuToggleBtn, mainMenuEl, }) {
+function *onToggleMainMenu({ doc, menuToggleBtn, mainMenuEl, keyboardBannerEl, }) {
 	// main menu currently closed?
 	if (yield matches(".hidden",mainMenuEl)) {
 		yield IO.do(hideMessageBanner);
 		yield IO.do(closeHelp);
+		yield addClass("menu-showing",keyboardBannerEl);
 		yield removeClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","false",mainMenuEl);
 		yield setElAttr("aria-expanded","true",menuToggleBtn);
@@ -339,14 +340,13 @@ function *onToggleMainMenu({ doc, menuToggleBtn, mainMenuEl, }) {
 	}
 }
 
-function *closeMenu(viewContext) {
-	var { menuToggleBtn, mainMenuEl, } = viewContext;
-
+function *closeMenu({ menuToggleBtn, mainMenuEl, keyboardBannerEl, }) {
 	// main menu visible?
 	if (yield iNot(matches(".hidden",mainMenuEl))) {
 		yield addClass("hidden",mainMenuEl);
 		yield setElAttr("aria-hidden","true",mainMenuEl);
 		yield setElAttr("aria-expanded","false",menuToggleBtn);
+		yield removeClass("menu-showing",keyboardBannerEl);
 		return IO.do(clearDocEventCapturing);
 	}
 }

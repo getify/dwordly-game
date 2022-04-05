@@ -600,14 +600,14 @@ menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio] +
 menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label::after {
 	visibility: visible;
 }
-menu#main-menu > li#menu-color-mode-selector div:nth-child(2) {
+menu#main-menu > li#menu-color-mode-selector > #color-mode-selector-track {
 	position: relative;
+	z-index: 0;
 	top: calc(var(--thumb-size) / 6);
 	align-self: center;
 	width: calc(var(--thumb-size) * 2);
 	margin: 0 calc(var(--thumb-size) * -1);
 	height: calc(var(--thumb-size));
-	z-index: 1;
 	background-color: var(--color-menu-color-mode-selector);
 	border-radius: calc(var(--thumb-size) / 2);
 }
@@ -695,6 +695,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	border-bottom: thin solid var(--color-next-word-separator);
 }
 
+/* play-action gutter */
 #played-words > div:nth-child(2) {
 	position: relative;
 	height: 100%;
@@ -1008,6 +1009,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	grid-area: keyboard;
 
 	position: relative;
+	z-index: 0;
 	width: var(--play-width);
 	height: calc((var(--key-height) * 3) + (var(--key-spacing) * 2));
 	margin: 0 auto var(--bottom-spacing) auto;
@@ -1048,7 +1050,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	--banner-text-size: calc(var(--horz-unit) * 5);
 
 	display: block;
-	position: fixed;
+	position: absolute;
 	background-color: var(--color-keyboard-banner);
 	color: var(--color-keyboard-banner-text);
 	font-weight: bold;
@@ -1071,6 +1073,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	user-select: text !important;
 	cursor: default !important;
 }
+#keyboard > form > #keyboard-disabled-banner.menu-showing,
 #keyboard > form > #keyboard-disabled-banner.help-showing,
 #keyboard > form > #keyboard-disabled-banner.hidden {
 	display: none;
