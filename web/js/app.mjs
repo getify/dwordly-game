@@ -205,8 +205,10 @@ function *runApp({
 	// handle main-menu clicks
 	yield doIOxBackground(onMainMenuClicks,[
 		merge([
-			IOx.onEvent(colorModeEl,"mousedown"),
-			IOx.onEvent(colorModeEl,"mousemove"),
+			IOx.onEvent(colorModeEl,"gotpointercapture"),
+			IOx.onEvent(colorModeEl,"pointerdown"),
+			IOx.onEvent(colorModeEl,"pointermove"),
+			IOx.onEvent(colorModeEl,"pointerup"),
 			IOx.onEvent(mainMenuEl,"click"),
 		]),
 	]);
@@ -431,27 +433,47 @@ function *onMainMenuClicks({ mainMenuEl, colorModeEl, state, },evt) {
 				]
 			);
 		}
-		// tracking mousedown/mousemove events on color-mode selector
+		// tracking drag events on color-mode selector's thumb
 		else {
+			let activeOptionLabelEl = yield findElement("input[type=radio]:checked + label",colorModeEl);
+			let inactiveOptionEl = yield findElement("input[type=radio]:not(:checked)",colorModeEl);
+			let inactiveOptionLabelEl = yield findElement("input[type=radio]:not(:checked) + label",colorModeEl);
+			let trackEl = yield findElement("#color-mode-selector-track",colorModeEl);
+
+			// prevent the pointer-capture from starting?
+			if (
+				evt.type == "gotpointercapture" &&
+				evt.target === activeOptionLabelEl &&
+				evt.pointerId &&
+				evt.target.releasePointerCapture
+			) {
+				evt.target.releasePointerCapture(evt.pointerId);
+			}
+
 			// did we start dragging the color-mode selector thumb?
 			if (
-				evt.type == "mousedown" && !state.colorModeMouseDown &&
-				(yield matches("input[type=radio]:checked + label",evt.target))
+				evt.type == "pointerdown" &&
+				!state.colorModeMouseDown &&
+				evt.target === activeOptionLabelEl
 			) {
 				state.colorModeMouseDown = true;
 			}
 			// have we dragged it toward the not-yet-active option?
 			else if (
-				evt.type == "mousemove" && state.colorModeMouseDown &&
-				(yield matches("#color-mode-selector-track, input[type=radio]:not(:checked) + label",evt.target))
+				evt.type == "pointermove" &&
+				state.colorModeMouseDown &&
+				[ inactiveOptionLabelEl, trackEl, ].includes(evt.target)
 			) {
 				state.colorModeMouseDown = false;
 
 				// toggle color mode selection
-				let colorModeSelectorEl = yield findElement("input[type=radio]:not(:checked)",colorModeEl);
-				state.colorMode = yield getElAttr("value",colorModeSelectorEl);
+				state.colorMode = yield getElAttr("value",inactiveOptionEl);
 				yield IO.do(updateColorModeSelector);
 				yield IO.do(onChangeColorMode);
+			}
+			else if (evt.type == "pointerup") {
+				state.colorModeMouseDown = false;
+				return IO.do(cancelEvent,evt);
 			}
 		}
 	}

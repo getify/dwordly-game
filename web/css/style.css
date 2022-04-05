@@ -244,6 +244,7 @@ html {
 	box-sizing: inherit;
 	-webkit-user-select: none;
 	user-select: none;
+	-webkit-tap-highlight-color: var(--color-transparent);
 }
 
 body {
@@ -596,11 +597,7 @@ menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio] +
 	visibility: hidden;
 	margin-left: calc(var(--horz-unit) * 3);
 }
-menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label {
-	pointer-events: none;
-}
 menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label::after {
-	pointer-events: auto;
 	visibility: visible;
 }
 menu#main-menu > li#menu-color-mode-selector div:nth-child(2) {
@@ -631,13 +628,18 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	visibility: hidden;
 	margin-right: calc(var(--horz-unit) * 3);
 }
+menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label::before {
+	visibility: visible;
+}
+menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio]:checked + label,
 menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label {
 	pointer-events: none;
 }
-menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio]:checked + label::before {
+menu#main-menu > li#menu-color-mode-selector div:first-child input[type=radio] + label::after,
+menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + label::before {
 	pointer-events: auto;
-	visibility: visible;
 }
+
 
 #play-area {
 	--max-letter-count: 4;
