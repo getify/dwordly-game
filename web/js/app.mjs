@@ -61,6 +61,9 @@ IO.do(main).run(window).catch(reportError);
 
 // ************************************
 
+const OK_SCORE_THRESHOLD = 50;
+const GOOD_SCORE_THRESHOLD = 75;
+
 function *main({ window: win, document: doc, } = {}) {
 	var viewContext = {
 		win,
@@ -96,10 +99,10 @@ function *main({ window: win, document: doc, } = {}) {
 		keyboardEl: yield getElement("keyboard"),
 
 		state: {
-			score: 0,
 			playMode: 0,
 			maxWordLength: 0,
 			playedWords: [],
+			playScores: [],
 			pendingNextWord: null,
 			activeLetter: null,
 			colorModeMouseDown: false,
@@ -586,6 +589,7 @@ function *onNewGame({
 	state.playedWords = [ game[0], ];
 
 	// update the scoreboard
+	state.playScores.length = 0;
 	yield IO.do(updateGameScore);
 
 	// render the initial played-words list
@@ -609,6 +613,7 @@ function *renderPlayedWords({
 	state: {
 		maxWordLength,
 		playedWords,
+		playScores,
 	},
 }) {
 	yield removeClass("complete",playedWordsEl);
@@ -620,6 +625,7 @@ function *renderPlayedWords({
 		yield addClass("word",wordEl);
 		yield setElAttr("aria-label",`Word: ${word}`);
 
+		// add word's letters individually
 		for (let letter of word) {
 			let letterEl = yield createElement("div");
 			yield addClass("letter",letterEl);
@@ -629,6 +635,48 @@ function *renderPlayedWords({
 			yield setInnerText(letter,spanEl);
 			yield appendChild(letterEl,spanEl);
 			yield appendChild(wordEl,letterEl);
+		}
+
+		// add a score-trend indicator icon?
+		if (idx > 0) {
+			let scoreTrendEl = yield createElement("i");
+			yield addClass("score-trend",scoreTrendEl);
+
+			// indicate score trend (upward or downward)
+			let scoreTrend = (playScores[idx] >= playScores[idx - 1]) ? "Up" : "Down";
+			if (playScores[idx] < 100) {
+				yield addClass(scoreTrend.toLowerCase(),scoreTrendEl);
+			}
+
+			// indicate score range with icon (color)
+			if (playScores[idx] == 100) {
+				yield addClass("perfect",scoreTrendEl);
+			}
+			else if (playScores[idx] >= GOOD_SCORE_THRESHOLD) {
+				yield addClass("good",scoreTrendEl);
+			}
+			else if (playScores[idx] >= OK_SCORE_THRESHOLD) {
+				yield addClass("ok",scoreTrendEl);
+			}
+
+			// ARIA descriptive label for indicator icon
+			yield setInnerText(
+				((playScores[idx] < 100) ?
+					`Score Trend: ${scoreTrend}` :
+					"Perfect Score!"
+				),
+				scoreTrendEl
+			);
+
+			// announce current score trend via ARIA?
+			if (idx == playedWords.length - 1) {
+				yield setElAttr("aria-atomic","true",scoreTrendEl);
+				yield setElAttr("aria-owns","game-score",scoreTrendEl);
+				yield setElAttr("aria-describedby","game-score",scoreTrendEl);
+				yield setElAttr("aria-live","polite",scoreTrendEl);
+			}
+
+			yield appendChild(wordEl,scoreTrendEl);
 		}
 
 		yield appendChild(playedWordsListEl,wordEl);
@@ -950,6 +998,11 @@ function *onPlayWord({
 				state.playedWords.push(state.pendingNextWord);
 			}
 
+			// update the scoreboard
+			state.playScores.length = 0;
+			yield IO.do(updateGameScore);
+
+			// render all played words
 			yield IO.do(renderPlayedWords);
 
 			// make sure undo/undo-all buttons are available
@@ -957,9 +1010,6 @@ function *onPlayWord({
 				yield enableEl(undoAllBtn);
 			}
 			yield enableEl(undoBtn);
-
-			// update the scoreboard
-			yield IO.do(updateGameScore);
 
 			let moreMovedAllowed = yield IO.do(movesPossible,state.playedWords);
 			if (moreMovedAllowed) {
@@ -975,8 +1025,9 @@ function *onPlayWord({
 				yield setInnerHTML("",nextPlayWordEl);
 				yield IO.do(scrollDownPlayArea);
 				yield IO.do(updatePlayMode,/*nextPlayMode=*/6);
-				let gameOverMsg = `Score: ${state.score}%<br>${
-					(state.score == 100) ? "Awesome!" : "Undo moves and try again?"
+				let score = state.playScores[state.playScores.length - 1];
+				let gameOverMsg = `Score: ${score}%<br>${
+					(score == 100) ? "Awesome!" : "Undo moves and try again?"
 				}`;
 				return IO.do(showMessageBanner,gameOverMsg);
 			}
@@ -998,6 +1049,7 @@ function *onUndoAllWords({
 		state.playedWords.length = 1;
 
 		// update the scoreboard
+		state.playScores.length = 0;
 		yield IO.do(updateGameScore);
 
 		state.maxWordLength = state.playedWords[state.playedWords.length - 1].length;
@@ -1030,6 +1082,7 @@ function *onUndoWord({
 		state.playedWords.pop();
 
 		// update the scoreboard
+		state.playScores.length = 0;
 		yield IO.do(updateGameScore);
 
 		// re-compute the max word length
@@ -1204,14 +1257,17 @@ function *hideMessageBanner({ messageBannerEl, }) {
 }
 
 function *updateGameScore({ scoreEl, state, }) {
+	state.playScores = yield IO.do(scoreGame,state.playedWords);
+
 	if (state.playedWords.length > 1) {
-		yield setElAttr("aria-live","polite",scoreEl);
-		state.score = yield IO.do(scoreGame,state.playedWords);
-		if (state.score >= 80) {
+		let score = state.playScores[state.playScores.length - 1];
+
+		// indicate score range
+		if (score >= GOOD_SCORE_THRESHOLD) {
 			yield addClass("good",scoreEl);
 			yield removeClass("ok",scoreEl);
 		}
-		else if (state.score >= 50) {
+		else if (score >= OK_SCORE_THRESHOLD) {
 			yield addClass("ok",scoreEl);
 			yield removeClass("good",scoreEl);
 		}
@@ -1219,12 +1275,15 @@ function *updateGameScore({ scoreEl, state, }) {
 			yield removeClass("ok",scoreEl);
 			yield removeClass("good",scoreEl);
 		}
-		let score = state.score.toFixed(1).replace(/\.0$/,"");
+
+		yield setElAttr("aria-live","polite",scoreEl);
 		return setInnerText(`${score}%`,scoreEl);
 	}
 	else {
-		yield setElAttr("aria-live","off",scoreEl);
+		yield removeClass("ok",scoreEl);
 		yield removeClass("good",scoreEl);
+		yield removeElAttr("aria-describedby",scoreEl);
+		yield setElAttr("aria-live","off",scoreEl);
 		return setInnerText("",scoreEl);
 	}
 }

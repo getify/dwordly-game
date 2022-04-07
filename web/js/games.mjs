@@ -110,34 +110,41 @@ function *scoreGame(
 			maxDifficultyRating,
 		},
 	},
-	game
+	fullGame
 ) {
-	var score = 0;
-	var difficultyFactor = (difficultyRating - minDifficultyRating) / (maxDifficultyRating - minDifficultyRating);
+	var playScores = [];
+	var difficultyFactor =
+		(difficultyRating - minDifficultyRating) / (maxDifficultyRating - minDifficultyRating);
 
-	// 65% of the score: overall character count
-	var gameTotalCharCount = game.join("").length;
-	var optimalTotalCharCount = optimalPath.join("").length;
-	score += Math.min(65,(65 * (optimalTotalCharCount / gameTotalCharCount)));
+	// compute cummulative score percentage for each word in the game
+	for (let i = 1; i <= fullGame.length; i++) {
+		let game = fullGame.slice(0,i);
+		let score = 0;
 
-	// 20% of the score: length of the dwordly path
-	score += (20 * (
-		Math.min(game.length,optimalPath.length) /
-		Math.max(game.length,optimalPath.length)
-	));
+		// 65% of the score: overall character count
+		let gameTotalCharCount = game.join("").length;
+		let optimalTotalCharCount = optimalPath.join("").length;
+		score += Math.min(65,(65 * (optimalTotalCharCount / gameTotalCharCount)));
 
-	// 15% of the score: length of final word
-	var gameFinalWordLength = game[game.length - 1].length;
-	var optimalFinalWordLength = optimalPath[optimalPath.length - 1].length;
-	score += Math.min(15,(15 * optimalFinalWordLength / gameFinalWordLength));
+		// 20% of the score: length of the dwordly path
+		score += (20 * (
+			Math.min(game.length,optimalPath.length) /
+			Math.max(game.length,optimalPath.length)
+		));
 
-	// scale the raw score by the difficulty-factor
-	score = score * (1 - ((100 - score) * (1 - difficultyFactor) / 100));
+		// 15% of the score: length of final word
+		var gameFinalWordLength = game[game.length - 1].length;
+		var optimalFinalWordLength = optimalPath[optimalPath.length - 1].length;
+		score += Math.min(15,(15 * optimalFinalWordLength / gameFinalWordLength));
 
-	// truncate to a single decimal place
-	score = Number(score.toFixed(1));
+		// scale the raw score by the difficulty-factor
+		score = score * (1 - ((100 - score) * (1 - difficultyFactor) / 100));
 
-	return score;
+		// drop any decimal places
+		playScores.push(Math.floor(score));
+	}
+
+	return playScores;
 }
 
 function *findShortestPath({ state: { neighbors, }, },word) {

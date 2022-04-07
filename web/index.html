@@ -21,8 +21,8 @@ if (document.documentElement && document.documentElement.style && document.docum
 // light/dark mode image preloads
 {
 	window.PRELOAD_IMAGES = Object.freeze({
-		light: Object.freeze(["icon-menu.svg","icon-help.svg","icon-close.svg","icon-play-new-game.svg","icon-help.svg","icon-next-play-marker.svg","icon-undo.svg","icon-undo-all.svg","icon-remove-letter.svg","icon-insert-here.svg","icon-add-letter.svg","icon-accept-changes.svg","icon-abandon-changes.svg","animated-loader.svg","animated-hand.svg","help-letter.svg","help-letter-activated.svg","help-keyboard-key.svg","help-remove-letter.svg","icon-add-letter.svg","icon-insert-here.svg","icon-accept-changes.svg","icon-abandon-changes.svg","icon-undo.svg","icon-undo-all.svg","help-example-1.svg","help-example-2.svg",]),
-		dark: Object.freeze(["icon-menu.svg","icon-help.svg","icon-close.svg","icon-play-new-game.svg","icon-menu-help.svg","icon-next-play-marker.svg","icon-undo.svg","icon-undo-all.svg","icon-remove-letter.svg","icon-insert-here.svg","icon-add-letter.svg","icon-accept-changes.svg","icon-abandon-changes.svg","animated-loader.svg","animated-hand.svg","help-letter.svg","help-letter-activated.svg","help-keyboard-key.svg","help-remove-letter.svg","help-add-letter.svg","icon-insert-here.svg","help-accept-changes.svg","help-abandon-changes.svg","icon-undo.svg","icon-undo-all.svg","help-example-1.svg","help-example-2.svg",]),
+		light: Object.freeze(["icon-menu.svg","icon-help.svg","icon-close.svg","icon-play-new-game.svg","icon-help.svg","icon-score-trend-up-low.svg","icon-score-trend-up-ok.svg","icon-score-trend-up-good.svg","icon-score-trend-down-low.svg","icon-score-trend-down-ok.svg","icon-score-trend-down-good.svg","icon-next-play-marker.svg","icon-undo.svg","icon-undo-all.svg","icon-remove-letter.svg","icon-insert-here.svg","icon-add-letter.svg","icon-accept-changes.svg","icon-abandon-changes.svg","animated-loader.svg","animated-hand.svg","help-letter.svg","help-letter-activated.svg","help-keyboard-key.svg","help-remove-letter.svg","icon-add-letter.svg","icon-insert-here.svg","icon-accept-changes.svg","icon-abandon-changes.svg","icon-undo.svg","icon-undo-all.svg","help-example-1.svg","help-example-2.svg",]),
+		dark: Object.freeze(["icon-menu.svg","icon-help.svg","icon-close.svg","icon-play-new-game.svg","icon-menu-help.svg","icon-score-trend-up-low.svg","icon-score-trend-up-ok.svg","icon-score-trend-up-good.svg","icon-score-trend-down-low.svg","icon-score-trend-down-ok.svg","icon-score-trend-down-good.svg","icon-next-play-marker.svg","icon-undo.svg","icon-undo-all.svg","icon-remove-letter.svg","icon-insert-here.svg","icon-add-letter.svg","icon-accept-changes.svg","icon-abandon-changes.svg","animated-loader.svg","animated-hand.svg","help-letter.svg","help-letter-activated.svg","help-keyboard-key.svg","help-remove-letter.svg","help-add-letter.svg","icon-insert-here.svg","help-accept-changes.svg","help-abandon-changes.svg","icon-undo.svg","icon-undo-all.svg","help-example-1.svg","help-example-2.svg",]),
 	});
 	let colorMode = window.localStorage ? window.localStorage.getItem("color-mode") : undefined;
 	if (![ "light", "dark", ].includes(colorMode)) {
@@ -50,8 +50,6 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<button type="button" id="help-btn" aria-controls="help-popup" aria-expanded="false" aria-label="Open help and game instructions"></button>
 
 	<span id="title" aria-label="Game title">DWORDLY</span>
-
-	<span id="game-score" class="hidden" aria-live="off" aria-label="Game score"></span>
 </header>
 <menu role="menu" id="main-menu" class="hidden" aria-hidden="true" aria-label="main menu">
 	<button type="button" id="close-menu-btn" aria-label="Close menu">×</button>
@@ -81,9 +79,10 @@ if (document.documentElement && document.documentElement.style && document.docum
 <div id="play-area" class="hidden" aria-label="Play the game here">
 	<div id="played-words">
 		<ul id="played-words-list" aria-label="All the words played so far in this game"></ul>
-		<div>
+		<div id="play-action-gutter">
 			<button type="button" id="undo-all-btn" aria-label="Undo all played words to restart current game" disabled></button>
 			<button type="button" id="undo-btn" aria-label="Undo the most recent played word" disabled></button>
+			<span id="game-score" class="hidden" aria-live="off" aria-label="Game score" aria-atomic="true"></span>
 		</div>
 	</div>
 	<div id="next-play"><form role="none">
@@ -108,7 +107,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 
 <div id="loading">Loading... please wait.</div>
 
-<div id="message-banner" class="hidden" aria-live="off"></div>
+<div id="message-banner" class="hidden" aria-live="off" aria-atomic="true"></div>
 
 <div id="help-popup" class="hidden">
 	<button type="button" id="close-help-btn" aria-label="Close the help popup"></button>
@@ -152,7 +151,7 @@ if (document.documentElement && document.documentElement.style && document.docum
 	<section id="help-about-content" class="hidden" aria-labelledby="help-about-tab-text" role="tabpanel">
 		<p>For those who enjoy playing word games but not having to make lucky guesses!</p>
 		<p>Please note: <strong>This game is under active development</strong> so things may break or change at any time. Thank you for your patience and feedback.</p>
-		<p>Version: <strong>0.6.11</strong></p>
+		<p>Version: <strong>0.7.0</strong></p>
 		<p>&copy; 2022 Kyle Simpson | getify @ gmail</p>
 	</section>
 </div>
