@@ -147,78 +147,99 @@ function *scoreGame(
 	return playScores;
 }
 
-function *findShortestPath({ state: { neighbors, }, },word) {
-	var shortestWord = word;
-	var pathTree = {};
+function *findShortestPath({ state: { neighbors, }, },startingWord) {
+	var queue = [
+		[ null, startingWord, startingWord.length ]
+	];
+	var pathCharCounts = {
+		[startingWord]: startingWord.length,
+	};
+	var backtrace = {};
+	var bestPathCharCount = Infinity;
+	var terminalWordPathCharCount = Infinity;
+	var terminalWord = startingWord;
 
-	// localized scope block (for scope clarity)
-	{
-		let visited = new Set([ word ]);
-		let queue = [ word ];
+	while (queue.length > 0) {
+		let [ prevWord, nextWord, pathCharCount ] = queue.shift();
 
-		// breadth-first traversal of word neighbors
-		while (queue.length > 0) {
-			let nextWord = queue.shift();
+		// candidate path is shorter than the best
+		// candidate path already identified (if any)?
+		if (pathCharCount < bestPathCharCount) {
+			if (
+				// found a shorter terminal word?
+				nextWord.length < terminalWord.length ||
 
-			// is this word actually in our dictionary?
+				(
+					// same length terminal word?
+					nextWord.length == terminalWord.length &&
+
+					// ...on a shorter overall path?
+					pathCharCount < terminalWordPathCharCount
+				)
+			) {
+				terminalWord = nextWord;
+				terminalWordPathCharCount = pathCharCount;
+			}
+
+			// found a best-path candidate ending in a
+			// single-letter word?
+			if (nextWord.length == 1) {
+				terminalWord = nextWord;
+				bestPathCharCount = terminalWordPathCharCount = pathCharCount;
+				continue;
+			}
+
+			// any neighbors of current word to consider?
 			if (neighbors[nextWord]) {
-				// keep track of the shortest word we find
-				// during the traversal
-				if (nextWord.length < shortestWord.length) {
-					shortestWord = nextWord;
-				}
-
 				for (let { text: neighbor } of neighbors[nextWord]) {
-					// haven't seen (queued up) this word
-					// yet?
-					if (!visited.has(neighbor)) {
-						// record path from this neighbor back
-						// to the previous word
-						pathTree[neighbor] = nextWord;
-
-						// queue this word up for further
-						// inspection
-						queue[queue.length] = neighbor;
-
-						// mark this word as having been
-						// queued up for further inspection
-						visited.add(neighbor);
+					// prevent a cyclic back-track to the
+					// previous word
+					if (neighbor != prevWord) {
+						// not yet previously computed the
+						// a path-character-length to this
+						// neighbor word?
+						if (!pathCharCounts[neighbor]) {
+							pathCharCounts[neighbor] = Infinity;
+						}
+						// compute current path-character
+						// length to this neighbor word
+						let neighborPathCharCount = pathCharCounts[nextWord] + neighbor.length;
+						if (neighborPathCharCount < pathCharCounts[neighbor]) {
+							pathCharCounts[neighbor] = neighborPathCharCount;
+							backtrace[neighbor] = nextWord;
+							insertIntoQueue(nextWord,neighbor,neighborPathCharCount);
+						}
 					}
 				}
+			}
+			// because it's a priority queue, once this
+			// is true, we can bail
+			else if (pathCharCount > bestPathCharCount) {
+				break;
 			}
 		}
 	}
 
-	// localized scope block (for scope clarity)
-	{
-		// traverse the discovered paths in reverse
-		// from shortest-found word back up to target
-		// word
-		let shortestPath;
-		let pathWord = shortestWord;
+	var path = [ terminalWord ];
+	var word = terminalWord;
+	while (word != startingWord) {
+		word = backtrace[word];
+		path.unshift(word);
+	}
+	return path;
 
-		// do we have a path longer than two words?
-		if (pathTree[pathWord]) {
-			shortestPath = [];
-			while (pathTree[pathWord]) {
-				shortestPath[shortestPath.length] = pathWord;
-				pathWord = pathTree[pathWord];
+	// *****************************
+
+	function insertIntoQueue(prevWord,nextWord,pathCharCount) {
+		let insertIdx = queue.length;
+		for (let i = 0; i < queue.length; i++) {
+			let [ ,, entryPathCharCount, ] = queue[i];
+			if (entryPathCharCount > pathCharCount) {
+				insertIdx = i;
+				break;
 			}
-			shortestPath[shortestPath.length] = pathWord;
 		}
-		// do we have a trivial 2-word path?
-		else if (Object.keys(pathTree).length > 0) {
-			shortestPath = [ Object.keys(pathTree)[0], word, ];
-		}
-		// otherwise, a word is its own trivial path
-		else {
-			shortestPath = [ shortestWord, ];
-		}
-
-		// reverse the traversal path so it now
-		// starts with the target word and moves
-		// down toward the shortest-found word
-		return shortestPath.reverse();
+		queue.splice(insertIdx,0,[ prevWord, nextWord, pathCharCount, ]);
 	}
 }
 
