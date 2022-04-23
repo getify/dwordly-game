@@ -109,6 +109,7 @@ function *main({ window: win, document: doc, } = {}) {
 			hints: {
 				letterHandHintShown: false,
 				keyboardHandHintShown: false,
+				keyboardBannerClosed: false,
 			},
 		},
 	};
@@ -134,7 +135,8 @@ function *main({ window: win, document: doc, } = {}) {
 		yield findElements("input[name=color-mode-selector]",viewContext.colorModeEl);
 	viewContext.nextPlayFormEl = yield findElement("form",viewContext.nextPlayEl);
 	viewContext.keyboardFormEl = yield findElement("form",viewContext.keyboardEl);
-	viewContext.keyboardBtns = yield findElements("button",viewContext.keyboardEl);
+	viewContext.keyboardBtns = yield findElements("button:not(#close-keyboard-banner-btn)",viewContext.keyboardEl);
+	viewContext.keyboardBannerCloseBtn = yield findElement("#close-keyboard-banner-btn",viewContext.keyboardBannerEl);
 
 	// run the rest of the app in this view-context
 	return applyIO(IO.do(runApp),viewContext);
@@ -158,6 +160,7 @@ function *runApp({
 	resetWordBtn,
 	nextPlayFormEl,
 	keyboardFormEl,
+	keyboardBannerCloseBtn,
 	state,
 }) {
 	// load the word dictionary
@@ -266,6 +269,11 @@ function *runApp({
 	// handle on-screen keyboard clicks
 	yield doIOxBackground(onScreenKeyboardClick,[
 		IOx.onEvent(keyboardFormEl,"click"),
+	]);
+
+	// handle keyboard banner close button
+	yield doIOxBackground(onCloseKeyboardBanner,[
+		IOx.onEvent(keyboardBannerCloseBtn,"click"),
 	]);
 
 	// handle hardware keyboard keystrokes
@@ -421,6 +429,11 @@ function *onMainMenuClicks({ mainMenuEl, colorModeEl, state, },evt) {
 
 	// main menu visible?
 	if (yield iNot(matches(".hidden",mainMenuEl))) {
+		let activeOptionLabelEl = yield findElement("input[type=radio]:checked + label",colorModeEl);
+		let inactiveOptionEl = yield findElement("input[type=radio]:not(:checked)",colorModeEl);
+		let inactiveOptionLabelEl = yield findElement("input[type=radio]:not(:checked) + label",colorModeEl);
+		let trackEl = yield findElement("#color-mode-selector-track",colorModeEl);
+
 		if (evt.type == "click") {
 			state.colorModeMouseDown = false;
 			return match(
@@ -433,16 +446,21 @@ function *onMainMenuClicks({ mainMenuEl, colorModeEl, state, },evt) {
 				],
 				$=>matches("#new-game-btn",target), $=>[
 					onNewGame,
-				]
+				],
+				$=>iAnd(
+					closest("li#menu-color-mode-selector",target),
+					matches("input[type=radio]:checked + label",target)
+				), function *toggleColorMode(){
+					// toggle color mode selection
+					state.colorMode = yield getElAttr("value",inactiveOptionEl);
+					yield IO.do(updateColorModeSelector);
+					yield IO.do(onChangeColorMode);
+					return IO.do(cancelEvent,evt);
+				}
 			);
 		}
 		// tracking drag events on color-mode selector's thumb
 		else {
-			let activeOptionLabelEl = yield findElement("input[type=radio]:checked + label",colorModeEl);
-			let inactiveOptionEl = yield findElement("input[type=radio]:not(:checked)",colorModeEl);
-			let inactiveOptionLabelEl = yield findElement("input[type=radio]:not(:checked) + label",colorModeEl);
-			let trackEl = yield findElement("#color-mode-selector-track",colorModeEl);
-
 			// prevent the pointer-capture from starting?
 			if (
 				evt.type == "gotpointercapture" &&
@@ -569,6 +587,11 @@ function *updateColorModeCSS({ doc, PRELOAD_IMAGES, state: { colorMode, }, }) {
 			.run();
 		yield appendChild(doc.head,linkEl);
 	}
+}
+
+function *onCloseKeyboardBanner({ keyboardBannerEl, state, }) {
+	state.hints.keyboardBannerClosed = true;
+	return addClass("hidden",keyboardBannerEl);
 }
 
 function *onNewGame({
@@ -1209,7 +1232,11 @@ function *updateKeyboard(
 	}
 
 	// toggle showing the keyboard-disabled banner
-	if (enable || state.playedWords.length > 1) {
+	if (
+		state.hints.keyboardBannerClosed ||
+		enable ||
+		state.playedWords.length > 1
+	) {
 		yield addClass("hidden",keyboardBannerEl);
 	}
 	else {

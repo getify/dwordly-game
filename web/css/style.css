@@ -1173,6 +1173,36 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 #keyboard > form > #keyboard-disabled-banner i#banner-activated-letter::after {
 	background-image: var(--image-keyboard-letter-activated);
 }
+#keyboard > form > #keyboard-disabled-banner #close-keyboard-banner-btn {
+	--button-size: calc(var(--horz-unit) * 10);
+
+	position: absolute;
+	top: calc(0px - (var(--button-size) / 2));
+	right: calc(0px - (var(--button-size) / 2));
+	width: var(--button-size);
+	height: var(--button-size);
+	padding: 0;
+	margin: 0;
+	font-size: var(--hidden-text-size);
+	line-height: var(--hidden-text-size);
+	border-radius: 50%;
+	outline: none;
+	color: var(--color-transparent);
+	background: var(--color-transparent);
+	border: none;
+	cursor: pointer;
+}
+#keyboard > form > #keyboard-disabled-banner #close-keyboard-banner-btn::after {
+	content: "";
+	display: block;
+	width: var(--button-size);
+	height: var(--button-size);
+	border-radius: 50%;
+	background-image: var(--image-close-btn);
+	background-position: 50% 50%;
+	background-size: calc(var(--button-size) * 0.6);
+	background-repeat: no-repeat;
+}
 
 #next-play > form,
 #keyboard > form {
