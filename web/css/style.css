@@ -49,6 +49,7 @@
 	--color-menu-btn: rgba(var(--color-white));
 	--color-menu-btn-text: rgba(var(--color-gray-4));
 	--color-menu-link: rgba(var(--color-green-2));
+	--color-menu-radio: rgba(var(--color-gray-4));
 	--color-menu-color-mode-selector: rgba(var(--color-gray-3));
 	--color-menu-color-mode-selector-thumb: rgba(var(--color-gray-4));
 	--color-help-popup: rgba(var(--color-gray-1));
@@ -126,6 +127,7 @@
 	--color-menu-btn: rgba(var(--color-gray-2));
 	--color-menu-btn-text: rgba(var(--color-gray-4));
 	--color-menu-link: rgba(var(--color-orange-2));
+	--color-menu-radio: rgba(var(--color-orange-2));
 	--color-menu-color-mode-selector: rgba(var(--color-gray-5));
 	--color-menu-color-mode-selector-thumb: rgba(var(--color-orange-2));
 	--color-help-popup: rgba(var(--color-gray-4));
@@ -203,6 +205,7 @@
 		--color-menu-btn: rgba(var(--color-gray-2));
 		--color-menu-btn-text: rgba(var(--color-gray-4));
 		--color-menu-link: rgba(var(--color-orange-2));
+		--color-menu-radio: rgba(var(--color-orange-2));
 		--color-menu-color-mode-selector: rgba(var(--color-gray-5));
 		--color-menu-color-mode-selector-thumb: rgba(var(--color-orange-2));
 		--color-help-popup: rgba(var(--color-gray-4));
@@ -503,6 +506,7 @@ menu#main-menu > li#menu-difficulty-selector input[type=radio] {
 	width: calc(var(--horz-unit) * 6);
 	height: calc(var(--horz-unit) * 6);
 	cursor: pointer;
+	accent-color: var(--color-menu-radio);
 }
 menu#main-menu > li#menu-difficulty-selector input[type=radio] + label {
 	align-self: center;
