@@ -1,3 +1,5 @@
+start.sh
+get-games.js
 node_modules/
 monio/
 web/js-nim/

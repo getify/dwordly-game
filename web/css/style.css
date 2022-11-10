@@ -350,7 +350,7 @@ header > #menu-toggle-btn::after {
 	background-size: var(--menu-button-size);
 	background-repeat: no-repeat;
 }
-header > #menu-toggle-btn:focus {
+header > #menu-toggle-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -382,7 +382,7 @@ header > #help-btn::after {
 	background-size: calc(var(--help-button-size) * 0.6);
 	background-repeat: no-repeat;
 }
-header > #help-btn:focus {
+header > #help-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -448,7 +448,7 @@ menu#main-menu > #close-menu-btn::after {
 	background-size: calc(var(--button-size) * 0.6);
 	background-repeat: no-repeat;
 }
-menu#main-menu > #close-menu-btn:focus {
+menu#main-menu > #close-menu-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -488,7 +488,7 @@ menu#main-menu > li button#new-game-btn:after {
 	background-size: var(--icon-size);
 	background-repeat: no-repeat;
 }
-menu#main-menu > li button#new-game-btn:focus {
+menu#main-menu > li button#new-game-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -549,7 +549,7 @@ menu#main-menu > li button#menu-help-btn:after {
 	background-size: var(--icon-size);
 	background-repeat: no-repeat;
 }
-menu#main-menu > li button#menu-help-btn:focus {
+menu#main-menu > li button#menu-help-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -837,7 +837,8 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 #played-words > #play-action-gutter > #undo-all-btn::after {
 	background-image: var(--image-undo-all-btn);
 }
-#played-words > #play-action-gutter > #undo-btn:focus, #undo-all-btn:focus {
+#played-words > #play-action-gutter > #undo-btn:focus-visible,
+#undo-all-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -969,7 +970,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	background-size: calc(var(--letter-remove-btn-size) * 0.8);
 	background-repeat: no-repeat;
 }
-.word > .letter > .remove-letter-btn:focus {
+.word > .letter > .remove-letter-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 }
 .word > .letter > input[type=radio]:checked + label + .remove-letter-btn {
@@ -1013,7 +1014,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	background-size: calc(var(--letter-insert-btn-size) * 0.65);
 	background-repeat: no-repeat;
 }
-.word > .letter > .insert-here-btn:focus {
+.word > .letter > .insert-here-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 }
 .word > .letter > button:disabled {
@@ -1049,7 +1050,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 #play-action-buttons > button:disabled {
 	display: none;
 }
-#play-action-buttons > button:focus {
+#play-action-buttons > button:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
@@ -1357,7 +1358,7 @@ menu#main-menu > li#menu-color-mode-selector div:last-child input[type=radio] + 
 	background-size: calc(var(--button-size) * 0.6);
 	background-repeat: no-repeat;
 }
-#help-popup > #close-help-btn:focus {
+#help-popup > #close-help-btn:focus-visible {
 	filter: drop-shadow(0 0 calc(var(--horz-unit) * 1.3) var(--color-button-highlight));
 	opacity: var(--active-btn-opacity);
 }
